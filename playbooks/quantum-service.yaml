@@ -1,0 +1,50 @@
+---
+- name: Quantum virtual network service
+  hosts: controller
+  sudo: True
+  gather_facts: True
+  tasks:
+
+  - name: install quantum-server and CLI for accessing the API
+    apt: pkg=$item
+    with_items:
+      - quantum-server
+      - python-cliff
+      - python-pyparsing
+
+  - name: ensure quantum database is present
+    mysql_db: name=quantum
+
+  - name: ensure quantum database user is present
+    mysql_user: name=quantum host=$item password=$quantum_db_password priv=quantum.*:ALL
+    with_items:
+      - localhost
+      - $controller_ip
+
+  - name: install quantum open vswitch plugin and dependencies
+    apt: pkg=$item
+    with_items:
+      - mysql-server
+      - python-mysqldb
+      - python-sqlalchemy
+      - quantum-plugin-openvswitch
+
+  - name: ensure ovs plugin configured to use database quantum
+    template: >
+          src=templates/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
+          dest=/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
+          owner=quantum group=quantum mode=0600
+    notify:
+      - restart quantum-server
+
+  - name: ensure quantum service has credentials to use keystone
+    template: >
+          src=templates/etc/quantum/api-paste.ini
+          dest=/etc/quantum/api-paste.ini
+          owner=quantum group=quantum mode=0600
+    notify:
+      - restart quantum-server
+
+  handlers:
+    - name: restart quantum-server
+      service: name=quantum-server state=restarted
