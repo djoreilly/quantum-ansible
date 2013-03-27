@@ -1,16 +1,17 @@
 ---
-- name: Install keystone
+- name: Keystone identity service
   hosts: controller
   sudo: True
-  gather_facts: False
-  vars:
-    admin_token: 012345SECRET99TOKEN012345
-
+  gather_facts: True # needed for var template
+ 
   tasks:
   # http://docs.openstack.org/folsom/openstack-compute/install/apt/content/install-keystone.html
   - name: ensure keystone package is installed
     apt: pkg=keystone
 
+  - name: ensure keystone service running
+    service: name=keystone state=started
+  
   - name: ensure sqlite keystone database is deleted
     file: dest=/var/lib/keystone/keystone.db state=absent
 
@@ -18,7 +19,11 @@
     mysql_db: name=keystone
 
   - name: ensure keystone database user is present
-    mysql_user: name=keystone host=% password=${keystone_db_password} priv=keystone.*:ALL
+    mysql_user: name=keystone host=$item password=${keystone_db_password} priv=keystone.*:ALL
+    with_items:
+      - $controller_ip
+      - 127.0.0.1
+      - ::1
 
   - name: ensure keystone config script is present
     template: >
@@ -43,7 +48,7 @@
 - name: configure keystone
   hosts: controller
   sudo: True
-  gather_facts: False
+  gather_facts: True
   vars:
     admin_token: 012345SECRET99TOKEN012345
     region: RegionOne
@@ -57,44 +62,52 @@
         password: $ec2_identity_password
       - name: swift
         password: $swift_identity_password
+      - name: quantum
+        password: $quantum_identity_password
 
     services:
       - name: keystone
         type: identity
         description: Identity Service
-        public_url: http://192.168.206.130:5000/v2.0
-        internal_url: http://192.168.206.130:5000/v2.0
-        admin_url: http://192.168.206.130:35357/v2.0
+        public_url: http://${controller_ip}:5000/v2.0
+        internal_url: http://${controller_ip}:5000/v2.0
+        admin_url: http://${controller_ip}:35357/v2.0
       - name: nova
         type: compute
         description: Compute Service
-        public_url: http://192.168.206.130:8774/v2/%(tenant_id)s
-        internal_url: http://192.168.206.130:8774/v2/%(tenant_id)s
-        admin_url: http://192.168.206.130:8774/v2/%(tenant_id)s
+        public_url: http://${controller_ip}:8774/v2/%(tenant_id)s
+        internal_url: http://${controller_ip}:8774/v2/%(tenant_id)s
+        admin_url: http://${controller_ip}:8774/v2/%(tenant_id)s
       - name: volume
         type: volume
         description: Volume Service
-        public_url: http://192.168.206.130:8776/v1/%(tenant_id)s
-        internal_url: http://192.168.206.130:8776/v1/%(tenant_id)s
-        admin_url: http://192.168.206.130:8776/v1/%(tenant_id)s
+        public_url: http://${controller_ip}:8776/v1/%(tenant_id)s
+        internal_url: http://${controller_ip}:8776/v1/%(tenant_id)s
+        admin_url: http://${controller_ip}:8776/v1/%(tenant_id)s
       - name: glance
         type: image
         description: Image Service
-        public_url: http://192.168.206.130:9292
-        internal_url: http://192.168.206.130:9292
-        admin_url: http://192.168.206.130:9292
+        public_url: http://${controller_ip}:9292
+        internal_url: http://${controller_ip}:9292
+        admin_url: http://${controller_ip}:9292
       - name: ec2
         type: ec2
         description: EC2 Compatibility Layer
-        public_url: http://192.168.206.130:8773/services/Cloud
-        internal_url: http://192.168.206.130:8773/services/Cloud
-        admin_url: http://192.168.206.130:8773/services/Admin
+        public_url: http://${controller_ip}:8773/services/Cloud
+        internal_url: http://${controller_ip}:8773/services/Cloud
+        admin_url: http://${controller_ip}:8773/services/Admin
       - name: swift
         type: object-store
         description: Object Storage Service
-        public_url: http://192.168.206.130:8888/v1/AUTH_%(tenant_id)s
-        internal_url: http://192.168.206.130:8888/v1/AUTH_%(tenant_id)s
-        admin_url: http://192.168.206.130:8888/v1
+        public_url: http://${controller_ip}:8888/v1/AUTH_%(tenant_id)s
+        internal_url: http://${controller_ip}:8888/v1/AUTH_%(tenant_id)s
+        admin_url: http://${controller_ip}:8888/v1
+      - name: quantum
+        type: network
+        description: Quantum Network Service
+        public_url: http://${controller_ip}:9696
+        internal_url: http://${controller_ip}:9696
+        admin_url: http://${controller_ip}:9696
 
   tasks:
 
