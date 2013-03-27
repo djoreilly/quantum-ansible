@@ -1,9 +1,5 @@
-[cloud:children]
-controller
-compute
+controller ansible_ssh_host=10.0.10.10
+netnode    ansible_ssh_host=10.0.10.11
 
-[controller]
-192.168.206.130
-
-[compute]
-192.168.206.131
+[compute_nodes]
+compute_node1 ansible_ssh_host=10.0.10.12
