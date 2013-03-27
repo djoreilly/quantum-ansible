@@ -1,7 +1,8 @@
 ---
-- hosts: controller
+- name: Glance image services
+  hosts: controller
   sudo: True
-  gather_facts: False
+  gather_facts: True
 
   tasks:
     # http://docs.openstack.org/essex/openstack-compute/install/apt/content/install-glance.html
@@ -20,7 +21,7 @@
   - name: ensure glance database user is present
     mysql_user: name=glance host=$item password=${glance_db_password} priv=glance.*:ALL
     with_items:
-      - '%'
+      - $controller_ip
       - localhost
 
   # http://docs.openstack.org/folsom/openstack-compute/install/apt/content/configure-glance-files.html
@@ -47,7 +48,8 @@
 
 
   # http://docs.openstack.org/folsom/openstack-compute/install/apt/content/images-verifying-install.html
-- hosts: controller
+- name: Ensure image
+  hosts: controller
   gather_facts: False
   tags:
     - image
@@ -63,4 +65,4 @@
     get_url: url=$cirros_url dest=/tmp/images/$imgfile
 
   - name: add cirros image
-    glance: name=cirros-0.3.0-x86_64 file=/tmp/images/$imgfile disk_format=qcow2 is_public=true user=admin tenant=demo password=secrete region=RegionOne auth_url=http://192.168.206.130:5000/v2.0
+    glance: name=cirros-0.3.0-x86_64 file=/tmp/images/$imgfile disk_format=qcow2 is_public=true user=admin tenant=demo password=secrete region=RegionOne auth_url=http://${controller_ip}:5000/v2.0
