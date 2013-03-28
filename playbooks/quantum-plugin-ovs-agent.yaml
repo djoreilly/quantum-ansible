@@ -1,0 +1,66 @@
+---
+- name: Open vSwitch Quantum plugin L2 agent and Open vSwitch
+  hosts:
+    - netnode
+    - compute_nodes
+  sudo: True
+  tasks:
+
+  - name: ensure packages are installed
+    apt: pkg=$item
+    with_items:
+      - openvswitch-common
+      - openvswitch-datapath-dkms
+      - openvswitch-datapath-source
+      - openvswitch-switch
+      - kernel-package
+
+  - name: ensure OVS kernel module is loaded
+    action: command /sbin/modprobe openvswitch
+    register: modprobe_result
+    ignore_errors: True
+
+  - name: build openvswitch-datapath kernel module - this may take a while
+    action: command /usr/bin/module-assistant -i auto-install openvswitch-datapath
+    only_if: "'${modprobe_result.stderr}'.find('FATAL: Module openvswitch not found.') == 0"
+    notify: restart openvswitch services
+
+  handlers:
+  - name: restart openvswitch services
+    action: service name=openvswitch-switch state=restarted
+
+
+- name: ensure OVS plugin agent is configured
+  hosts:
+    - netnode
+    - compute_nodes
+  sudo: True
+  tasks:
+  - name: add default ovs bridge br-int for agent
+    action: command /usr/bin/ovs-vsctl -- --may-exist add-br br-int
+
+  - name: install agent package
+    apt: name=quantum-plugin-openvswitch-agent
+
+  - name: ensure controller in playlist and online - need its IP for templates
+    action: command /bin/false
+    when_unset: ${hostvars.controller.ansible_eth1.ipv4.address}
+
+  - name: ensure ovs plugin agent configured
+    template: >
+          src=templates/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
+          dest=/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
+          owner=quantum group=quantum mode=0600
+    notify: restart ovs-agent
+
+  - name: ensure quantum.conf is configured
+    template: >
+          src=templates/etc/quantum/quantum.conf
+          dest=/etc/quantum/quantum.conf
+          owner=quantum group=quantum mode=0600
+    notify: restart ovs-agent
+
+  handlers:
+  - name: restart ovs-agent
+    service: name=quantum-plugin-openvswitch-agent state=restarted
+
