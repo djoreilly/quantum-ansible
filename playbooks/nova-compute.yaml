@@ -18,8 +18,15 @@
           owner=nova group=nova mode=0600
     notify:
       - restart nova-compute
-
-
+      
+  - name: ensure nova-compute.conf present
+    copy: >
+        src=files/etc/nova/nova-compute.conf
+        dest=/etc/nova/nova-compute.conf
+        owner=nova group=nova mode=0600
+    notify:
+      - restart nova-compute
+      
   handlers:
   - name: restart nova-compute
     service: name=nova-compute state=restarted
