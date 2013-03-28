@@ -1,0 +1,11 @@
+---
+- name: Horizon web gui dashboard service
+  hosts: controller
+  sudo: True
+  tasks:
+  - name: ensure horizon packages are installed
+    apt: pkg=$item update-cache=yes
+    with_items:
+      - memcached  
+      - libapache2-mod-wsgi
+      - openstack-dashboard

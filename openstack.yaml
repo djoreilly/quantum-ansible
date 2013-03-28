@@ -1,5 +1,11 @@
 - include: playbooks/common.yaml
+- include: playbooks/mysql.yaml
 - include: playbooks/keystone.yaml
 - include: playbooks/glance.yaml
 - include: playbooks/nova-controller.yaml
+- include: playbooks/quantum-service.yaml
 - include: playbooks/nova-compute.yaml
+- include: playbooks/quantum-plugin-ovs-agent.yaml
+- include: playbooks/quantum-l3-dhcp-agents.yaml
+- include: playbooks/horizon.yaml
+
