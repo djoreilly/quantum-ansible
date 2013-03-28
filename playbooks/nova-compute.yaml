@@ -26,7 +26,18 @@
         owner=nova group=nova mode=0600
     notify:
       - restart nova-compute
-      
+
+  - name: ensure /etc/libvirt/qemu.conf is correct
+    copy: >
+        src=files/etc/libvirt/qemu.conf
+        dest=/etc/libvirt/qemu.conf
+        owner=root group=root mode=0644
+    notify:
+      - restart libvirt
+
   handlers:
   - name: restart nova-compute
     service: name=nova-compute state=restarted
+
+  - name: restart libvirt
+    service: name=libvirt-bin state=restarted
