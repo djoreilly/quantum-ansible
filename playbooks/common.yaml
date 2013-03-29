@@ -46,8 +46,8 @@
           src=templates/etc/cron.daily/ntpdate 
           dest=/etc/cron.daily/ntpdate 
           owner=root group=root mode=0755
- 
-  - name: disable ntp service
-    service: name=ntp enabled=no
+
+  - name: stop ntp servive
+    service: name=ntp state=stopped enabled=no
 
 
