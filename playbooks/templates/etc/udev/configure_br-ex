@@ -1,0 +1,6 @@
+#!/bin/sh
+
+
+ip link set eth3 up
+ip address add {{ br_ex_ip }} dev br-ex
+ip link set dev br-ex up
