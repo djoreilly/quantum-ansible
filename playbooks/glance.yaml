@@ -26,12 +26,12 @@
 
   # http://docs.openstack.org/folsom/openstack-compute/install/apt/content/configure-glance-files.html
   - name: ensure glance-api.conf file is up to date
-    template: src=templates/etc/glance/glance-api.conf dest=/etc/glance/glance-api.conf owner=glance group=glance mode=0600
+    template: src=templates/etc/glance/glance-api.conf dest=/etc/glance/glance-api.conf owner=glance group=glance mode=0600 backup=yes
     notify:
     - restart glance-api
 
   - name: ensure glance-registry.conf file is up to date
-    template: src=templates/etc/glance/glance-registry.conf dest=/etc/glance/glance-registry.conf owner=glance group=glance mode=0600
+    template: src=templates/etc/glance/glance-registry.conf dest=/etc/glance/glance-registry.conf owner=glance group=glance mode=0600 backup=yes
     notify:
     - restart glance-registry
 
