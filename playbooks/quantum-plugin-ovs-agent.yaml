@@ -42,22 +42,18 @@
   - name: install agent package
     apt: name=quantum-plugin-openvswitch-agent
 
-  - name: ensure controller in playlist and online - need its IP for templates
-    action: command /bin/false
-    when_unset: ${hostvars.controller.ansible_eth1.ipv4.address}
-
   - name: ensure ovs plugin agent configured
     template: >
           src=templates/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
           dest=/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
-          owner=quantum group=quantum mode=0600
+          owner=quantum group=quantum mode=0600 backup=yes
     notify: restart ovs-agent
 
   - name: ensure quantum.conf is configured
     template: >
           src=templates/etc/quantum/quantum.conf
           dest=/etc/quantum/quantum.conf
-          owner=quantum group=quantum mode=0600
+          owner=quantum group=quantum mode=0600 backup=yes
     notify: restart ovs-agent
 
   handlers:
