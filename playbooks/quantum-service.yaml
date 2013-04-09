@@ -2,7 +2,6 @@
 - name: Quantum virtual network service
   hosts: controller
   sudo: True
-  gather_facts: True
   tasks:
 
   - name: install quantum-server and CLI for accessing the API
@@ -33,15 +32,15 @@
     template: >
           src=templates/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
           dest=/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
-          owner=quantum group=quantum mode=0600
+          owner=quantum group=quantum mode=0600 backup=yes
     notify:
       - restart quantum-server
 
-  - name: ensure quantum service has credentials to use keystone
+  - name: ensure quantum.conf ok
     template: >
-          src=templates/etc/quantum/api-paste.ini
-          dest=/etc/quantum/api-paste.ini
-          owner=quantum group=quantum mode=0600
+          src=templates/etc/quantum/quantum.conf
+          dest=/etc/quantum/quantum.conf
+          owner=quantum group=quantum mode=0600 backup=yes
     notify:
       - restart quantum-server
 
