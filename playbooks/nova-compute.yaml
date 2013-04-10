@@ -37,8 +37,8 @@
       - restart libvirt
 
   handlers:
-  - name: restart nova-compute
-    service: name=nova-compute state=restarted
-
   - name: restart libvirt
     service: name=libvirt-bin state=restarted
+
+  - name: restart nova-compute
+    service: name=nova-compute state=restarted
