@@ -1,6 +1,6 @@
 #!/bin/sh
 
 
-ip link set eth3 up
+ip link set {{ ext_net_nic }} up
 ip address add {{ br_ex_ip }} dev br-ex
 ip link set dev br-ex up

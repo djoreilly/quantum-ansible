@@ -6,6 +6,6 @@
 - include: playbooks/quantum-service.yaml
 - include: playbooks/nova-compute.yaml
 - include: playbooks/quantum-plugin-ovs-agent.yaml
-- include: playbooks/quantum-l3-dhcp-agents.yaml
-- include: playbooks/horizon.yaml
+- include: playbooks/quantum-agents.yaml
+#- include: playbooks/horizon.yaml
 
