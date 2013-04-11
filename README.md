@@ -1,20 +1,17 @@
 # OpenStack with Quantum Ansible installer for Vagrant
   
-This repository contains a script that will automatically install OpenStack Folsom with Quantum networking onto VirtualBox VMs using [Ansible](http://ansible.cc/) and Vagrant. It is a modification of [Lorin Hochstein's](https://github.com/lorin/openstack-ansible) that used networking from Nova. The configuration is described in vms/Vagrantfile and there is a diagram and more instructions [here](http://techbackground.blogspot.ie/2013/03/automated-openstack-folsom-with-quantum.html). 
+This repository contains a script that will automatically install OpenStack Grizzly with Quantum networking onto VirtualBox VMs using [Ansible](http://ansible.cc/) and Vagrant. It is a modification of [Lorin Hochstein's](https://github.com/lorin/openstack-ansible) for Folsom that used networking from Nova. The configuration is described in vms/Vagrantfile.
 
 
 ## Install prereqs
 
- * Ansible >= v1.1 - at this time the version from pip is 1.0 and will not work (mysql lockout). So instead just get the latest:
+ * Ansible >= v1.1
 
-            $ sudo pip install paramiko PyYAML Jinja2
-            $ git clone git://github.com/ansible/ansible.git
-            $ cd ./ansible
-            $ sudo make install
+            $ sudo pip install paramiko PyYAML Jinja2 ansible
       Or follow [(http://ansible.cc/docs/gettingstarted.html)](http://ansible.cc/docs/gettingstarted.html)
          
  * [Vagrant](http://vagrantup.com) (tested on 1.0.7)
- * VirtualBox (tested on 4.2.8r83876 on Ubuntu 12.10)
+ * VirtualBox (tested on 4.2.10-84104 on Ubuntu 12.10 Desktop)
 
 ## Get the Ubuntu 12.04 (precise) Vagrant box
 
@@ -29,21 +26,20 @@ OpenStack, so there's an extra command required after cloning the repo:
 
 
         git clone http://github.com/djoreilly/quantum-ansible
+        git checkout grizzly
         cd openstack-ansible
         git submodule update --init
 
 
-## Bring up the cloud
+## Start the nodes and run the playbooks
 
-    make all
+    cd vms ; vagrant up ; cd ..
+    ansible-playbook -v openstack.yaml
 
+The controller has the Nova and Quantum CLIs.
 
+    cd vms; vagrant ssh controller
+    vagrant@controller:/vagrant$ ls
+    openrc  run-sample-session.sh  Vagrantfile
 
-
-If all goes well you should be able start the OpenStack dashboard on 
-
-[http://10.0.10.10/horizon](http://10.0.10.10/horizon)
-
-User: admin
-
-Password: secrete
+    vagrant@controller:~$ source /vagrant/openrc
