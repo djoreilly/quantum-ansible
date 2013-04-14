@@ -98,12 +98,13 @@
         public_url: http://${controller_ip}:8773/services/Cloud
         internal_url: http://${controller_ip}:8773/services/Cloud
         admin_url: http://${controller_ip}:8773/services/Admin
-      - name: swift
-        type: object-store
-        description: Object Storage Service
-        public_url: http://${controller_ip}:8888/v1/AUTH_%(tenant_id)s
-        internal_url: http://${controller_ip}:8888/v1/AUTH_%(tenant_id)s
-        admin_url: http://${controller_ip}:8888/v1
+        # commented out swift so it won't appear in the dashboard
+        #- name: swift
+        #  type: object-store
+        #  description: Object Storage Service
+        #  public_url: http://${controller_ip}:8888/v1/AUTH_%(tenant_id)s
+        #  internal_url: http://${controller_ip}:8888/v1/AUTH_%(tenant_id)s
+        #  admin_url: http://${controller_ip}:8888/v1
       - name: quantum
         type: network
         description: Quantum Network Service
@@ -149,4 +150,3 @@
           region=$region
     with_items: $services
     tags: keystone
-

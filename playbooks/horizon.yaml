@@ -3,9 +3,23 @@
   hosts: controller
   sudo: True
   tasks:
-  - name: ensure horizon packages are installed
-    apt: pkg=$item update-cache=yes
-    with_items:
-      - memcached  
-      - libapache2-mod-wsgi
-      - openstack-dashboard
+    - name: ensure horizon packages are installed
+      apt: pkg=$item update-cache=yes
+      with_items:
+        - memcached
+        - libapache2-mod-wsgi
+        - openstack-dashboard
+
+    - name: ensure dashboard is configured
+      copy: >
+          src=files/etc/openstack-dashboard/local_settings.py
+          dest=/etc/openstack-dashboard/local_settings.py
+          owner=root group=root mode=0644 backup=yes
+      notify: restart services
+
+  handlers:
+    - name: restart services
+      service: name=$item state=restarted
+      with_items:
+        - apache2
+        - memcached
