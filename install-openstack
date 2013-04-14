@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+
+git submodule update --init
+
+./start-nodes
+
+ansible-playbook -v openstack.yaml
+
+echo
+echo "The dashboard should be at http://10.0.10.10/horizon"
+

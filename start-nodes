@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+
+cd vms
+vagrant up controller
+vagrant up netnode
+vagrant up compute1
+cd ..
+
+echo
+echo "Nodes can be accessed like this:"
+echo "cd vms; vagrant ssh <controller | netnode | compute1>" 
