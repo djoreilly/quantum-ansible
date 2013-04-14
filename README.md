@@ -30,6 +30,7 @@ OpenStack, so there's an extra command required after cloning the repo:
 
         git clone http://github.com/djoreilly/quantum-ansible
         cd openstack-ansible
+        git checkout folsom
         git submodule update --init
 
 
