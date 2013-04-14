@@ -64,6 +64,8 @@
         password: $swift_identity_password
       - name: quantum
         password: $quantum_identity_password
+      - name: cinder
+        password: $cinder_identity_password
 
     services:
       - name: keystone

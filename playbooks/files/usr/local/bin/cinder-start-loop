@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# The cinder-volumes service needs an LVM volume group named cinder-volumes.
+# This script is idempotent.
+
+set -e
+set -x # for /var/log/upstart/cinder-start-loop.log
+date
+
+BACKING_FILE=/var/lib/cinder/loop-backing-file
+LOOP_DEV=/dev/loop0
+SIZE=20G
+
+[ $EUID -eq 0 ] || (echo "$0 must be run by root" && exit 1)
+
+[ -f $BACKING_FILE ]  || truncate --size $SIZE $BACKING_FILE
+losetup $LOOP_DEV     || losetup -fv $BACKING_FILE
+vgs cinder-volumes    || vgcreate cinder-volumes $LOOP_DEV
+
+exit 0

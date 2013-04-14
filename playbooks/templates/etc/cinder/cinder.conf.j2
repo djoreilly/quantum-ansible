@@ -1,0 +1,18 @@
+[DEFAULT]
+my_ip = {{ controller_ip }}
+iscsi_ip_address = {{ controller_ip }}
+
+rootwrap_config = /etc/cinder/rootwrap.conf
+sql_connection = mysql://cinder:{{cinder_db_password }}@{{ controller_ip }}/cinder
+api_paste_confg = /etc/cinder/api-paste.ini
+
+iscsi_helper = tgtadm
+volume_name_template = volume-%s
+volume_group = cinder-volumes
+debug = {{ log_debug }}
+verbose = {{ log_verbose }}
+auth_strategy = keystone
+
+state_path = /var/lib/cinder
+lock_path = /var/lock/cinder
+volumes_dir = /var/lib/cinder/volumes

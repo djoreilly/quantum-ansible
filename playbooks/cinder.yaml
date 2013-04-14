@@ -1,0 +1,76 @@
+---
+- name: Cinder block volume service
+  hosts: controller
+  sudo: True
+  tasks:
+  
+  - name: ensure packages are installed
+    apt: pkg=$item update_cache=yes
+    with_items:
+      - cinder-common
+      - cinder-api
+      - cinder-scheduler
+      - cinder-volume
+      - python-cinderclient
+      - open-iscsi  # is this needed on controller?
+      - tgt
+
+  - name: ensure cinder database is present
+    mysql_db: name=cinder
+    notify:
+      - sync cinder db
+      - restart cinder services
+      
+  - name: ensure cinder database user is present
+    mysql_user: name=cinder host=$item password=$cinder_db_password priv=cinder.*:ALL
+    with_items:
+      - localhost
+      - $controller_ip
+
+  - name: ensure api-paste.ini is configured
+    template: >
+        src=templates/etc/cinder/api-paste.ini.j2
+        dest=/etc/cinder/api-paste.ini
+        owner=cinder group=cinder mode=0644 backup=yes
+    notify:
+      - restart cinder services
+
+  - name: ensure cinder.conf is configured
+    template: >
+        src=templates/etc/cinder/cinder.conf.j2
+        dest=/etc/cinder/cinder.conf
+        owner=cinder group=cinder mode=0644 backup=yes
+    notify:
+      - restart cinder services
+
+  - name: ensure script to start loop dev for cinder-volumes in place
+    copy: >
+        src=files/usr/local/bin/cinder-start-loop
+        dest=/usr/local/bin/cinder-start-loop
+        owner=cinder group=cinder mode=0755
+ 
+  - name: ensure upstart job to start loop device at boot is present
+    copy: >
+        src=files/etc/init/cinder-start-loop.conf
+        dest=/etc/init/cinder-start-loop.conf
+        owner=root group=root mode=0644
+    notify:
+      - start loop device
+      - restart tgt
+
+  handlers:
+  - name: start loop device
+    service: name=cinder-start-loop state=started
+
+  - name: restart tgt
+    service: name=tgt state=restarted
+         
+  - name: sync cinder db
+    command: cinder-manage db sync
+
+  - name: restart cinder services
+    service: name=$item state=restarted
+    with_items:
+      - cinder-volume
+      - cinder-api
+      - cinder-scheduler
