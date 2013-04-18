@@ -1,5 +1,5 @@
 ---
-- name: Nova compute services
+- name: Nova controller services
   hosts: controller
   sudo: True
   gather_facts: True
@@ -61,3 +61,11 @@
       - nova-consoleauth
       - nova-cert
       - rabbitmq-server
+
+  - name: ensure rabbitmq starts after virtualbox additions at boot (1/2)
+    file: dest=/etc/rc2.d/S20rabbitmq-server state=absent
+    when_string: $ansible_bios_version is "VirtualBox"
+
+  - name: ensure rabbitmq starts after virtualbox additions at boot (2/2)
+    file: src=/etc/init.d/rabbitmq-server dest=/etc/rc2.d/S95rabbitmq-server state=link
+    when_string: $ansible_bios_version is "VirtualBox"
