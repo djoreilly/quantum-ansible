@@ -1,5 +1,5 @@
 ---
-- name: Quantum L3, DHCP and LBaaS agents
+- name: Quantum L3, DHCP, LBaaS and metadata agents
   hosts: netnode
   sudo: True
 
@@ -28,6 +28,7 @@
       - quantum-l3-agent
       - quantum-dhcp-agent
       - quantum-lbaas-agent
+      - quantum-metadata-agent
 
   - name: ensure quantum.conf ok
     template: >
@@ -38,6 +39,7 @@
       - restart l3 agent
       - restart dhcp agent
       - restart lbaas agent
+      - restart metadata agent
 
     # note: default lbaas_agent.ini works
 
@@ -48,6 +50,12 @@
           owner=quantum group=quantum mode=0600 backup=yes
     notify: restart l3 agent
 
+  - name: ensure metadata agent is configured
+    template: >
+          src=templates/etc/quantum/metadata_agent.ini.j2
+          dest=/etc/quantum/metadata_agent.ini
+          owner=quantum group=quantum mode=0600 backup=yes
+    notify: restart metadata agent
 
   handlers:
     - name: restart l3 agent
@@ -58,3 +66,6 @@
 
     - name: restart lbaas agent
       action: service name=quantum-lbaas-agent state=restarted
+
+    - name: restart metadata agent
+      action: service name=quantum-metadata-agent state=restarted

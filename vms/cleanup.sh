@@ -2,6 +2,7 @@
 
 #set -x
 
+echo "deleting vm1"
 nova delete vm1
 sleep 3
 
@@ -25,3 +26,6 @@ quantum net-delete net1
 quantum net-delete ext-net
 
 quantum security-group-delete test-vms
+
+echo "deleting key test-key"
+nova keypair-delete test-key
