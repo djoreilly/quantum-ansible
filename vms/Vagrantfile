@@ -11,7 +11,7 @@ Vagrant::Config.run do |config|
     
   config.vm.define :controller do |controller_config|
     controller_config.vm.host_name = "controller"
-    controller_config.vm.customize ["modifyvm", :id, "--memory", 1024]
+    controller_config.vm.customize ["modifyvm", :id, "--memory", 1200]
     controller_config.vm.network :hostonly, "10.0.10.10" # eth1 mgt
     controller_config.vm.network :hostonly, "192.168.10.10" # eth2 tenant api
   end
