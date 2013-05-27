@@ -11,20 +11,21 @@ chmod 0600 /vagrant/test-key
 nova keypair-add --pub-key /vagrant/test-key.pub test-key
 
 quantum net-create net1
-quantum subnet-create net1 10.0.33.0/24 --name=sub1
+quantum subnet-create net1 10.0.33.0/24 --name=sub1 --dns_nameservers 8.8.4.4 8.8.8.8
 
 quantum net-create ext-net --provider:network_type local --router:external true
-quantum subnet-create ext-net 192.168.101.0/24 --enable_dhcp False
+quantum subnet-create ext-net 192.168.101.0/24 --enable_dhcp False --name ext-sub
 
 quantum router-create router1
 quantum router-gateway-set router1 ext-net
 quantum router-interface-add router1 sub1
 
 TEST_SG=test-vms
-quantum security-group-create $TEST_SG
-quantum security-group-rule-create --protocol icmp --direction ingress $TEST_SG
+quantum security-group-create $TEST_SG --description "allow ping and ssh"
+quantum security-group-rule-create --protocol icmp --direction ingress \
+        --remote-ip-prefix 0.0.0.0/0 $TEST_SG
 quantum security-group-rule-create --protocol tcp --port-range-min 22 \
-	--port-range-max 22 --direction ingress $TEST_SG
+	--port-range-max 22 --direction ingress --remote-ip-prefix 0.0.0.0/0 $TEST_SG
 
 
 PORT_ID=$(quantum port-create --security-group $TEST_SG net1 \
