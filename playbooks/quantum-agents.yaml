@@ -22,6 +22,12 @@
   - name: ensure br-ex has eth3 enslaved
     command: /usr/bin/ovs-vsctl -- --may-exist add-port br-ex $ext_net_nic
 
+  - name: disable ipv6 on physical interface for br-ex
+    sysctl: name=net.ipv6.conf.${ext_net_nic}.disable_ipv6 value=1
+
+  - name: disable ipv6 on br-ex
+    sysctl: name=net.ipv6.conf.br-ex.disable_ipv6 value=1
+
   - name: install the packages
     apt: name=$item
     with_items:
