@@ -13,7 +13,7 @@
     template: >
           src=templates/etc/nova/nova.conf
           dest=/etc/nova/nova.conf
-          owner=nova group=nova mode=0600
+          owner=nova group=nova mode=0660
           backup=yes
     notify:
       - restart nova-compute
@@ -22,7 +22,7 @@
     copy: >
         src=files/etc/nova/nova-compute.conf
         dest=/etc/nova/nova-compute.conf
-        owner=nova group=nova mode=0600
+        owner=nova group=nova mode=0660
         backup=yes
     notify:
       - restart nova-compute
@@ -31,7 +31,7 @@
     copy: >
         src=files/etc/libvirt/qemu.conf
         dest=/etc/libvirt/qemu.conf
-        owner=root group=root mode=0644
+        owner=root group=root mode=0660
         backup=yes
     notify:
       - restart libvirt

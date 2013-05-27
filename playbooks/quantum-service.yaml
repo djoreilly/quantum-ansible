@@ -32,7 +32,7 @@
     template: >
           src=templates/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
           dest=/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
-          owner=quantum group=quantum mode=0600 backup=yes
+          owner=quantum group=quantum mode=0660 backup=yes
     notify:
       - restart quantum-server
 
@@ -40,7 +40,7 @@
     template: >
           src=templates/etc/quantum/quantum.conf
           dest=/etc/quantum/quantum.conf
-          owner=quantum group=quantum mode=0600 backup=yes
+          owner=quantum group=quantum mode=0660 backup=yes
     notify:
       - restart quantum-server
 

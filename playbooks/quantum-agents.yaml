@@ -34,7 +34,7 @@
     template: >
           src=templates/etc/quantum/quantum.conf
           dest=/etc/quantum/quantum.conf
-          owner=quantum group=quantum mode=0600 backup=yes
+          owner=quantum group=quantum mode=0660 backup=yes
     notify:
       - restart l3 agent
       - restart dhcp agent
@@ -47,14 +47,14 @@
     template: >
           src=templates/etc/quantum/l3_agent.ini
           dest=/etc/quantum/l3_agent.ini
-          owner=quantum group=quantum mode=0600 backup=yes
+          owner=quantum group=quantum mode=0660 backup=yes
     notify: restart l3 agent
 
   - name: ensure metadata agent is configured
     template: >
           src=templates/etc/quantum/metadata_agent.ini.j2
           dest=/etc/quantum/metadata_agent.ini
-          owner=quantum group=quantum mode=0600 backup=yes
+          owner=quantum group=quantum mode=0660 backup=yes
     notify: restart metadata agent
 
   handlers:
