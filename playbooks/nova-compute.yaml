@@ -36,6 +36,17 @@
     notify:
       - restart libvirt
 
+  - name: remove libvirt's default linux bridge virbr0 - 1/2
+    shell: ip link show dev virbr0 || true
+    register: ip_link_result
+
+  - name: remove libvirt's default linux bridge virbr0 - 2/2
+    shell: virsh net-destroy default && virsh net-undefine default
+    only_if: " '${ip_link_result.stderr}' == '' "
+    ignore_errors: True
+    notify: restart libvirt
+
+
   handlers:
   - name: restart libvirt
     service: name=libvirt-bin state=restarted
