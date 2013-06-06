@@ -21,8 +21,9 @@ Vagrant::Config.run do |config|
     netnode_config.vm.customize ["modifyvm", :id, "--memory", 512]
     netnode_config.vm.network :hostonly, "10.0.10.11" # eth1 mgt
     netnode_config.vm.network :hostonly, "10.0.20.11" # eth2 vm traffic
-    netnode_config.vm.network :hostonly, "192.168.101.101", :auto_config => false # eth3 provider net
+    netnode_config.vm.network :hostonly, "192.168.101.101", :auto_config => false # eth3 external net
     netnode_config.vm.customize ["modifyvm", :id, "--nicpromisc4", "allow-all"] # eth3
+    netnode_config.vm.provision :shell, :inline => "ip link set mtu 1546 dev eth2"
   end
 
   config.vm.define :compute1 do |compute1_config|
@@ -30,6 +31,7 @@ Vagrant::Config.run do |config|
     compute1_config.vm.customize ["modifyvm", :id, "--memory", 1024]
     compute1_config.vm.network :hostonly, "10.0.10.12" # eth1 mgt
     compute1_config.vm.network :hostonly, "10.0.20.12" # eth2 vm traffic
+    compute1_config.vm.provision :shell, :inline => "ip link set mtu 1546 dev eth2"
   end
 
 end
