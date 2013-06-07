@@ -33,7 +33,7 @@ PORT_ID=$(quantum port-create --security-group $TEST_SG net1 \
 
 sleep 5 # TODO find out why dhcp replies are dropped w/o this delay
 
-nova boot --flavor micro --image cirros-0.3.0-x86_64 --nic port-id=$PORT_ID \
+nova boot --flavor micro --image cirros-0.3.1-x86_64 --nic port-id=$PORT_ID \
           --key-name test-key vm1
 
 

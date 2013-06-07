@@ -48,21 +48,21 @@
 
 
   # http://docs.openstack.org/folsom/openstack-compute/install/apt/content/images-verifying-install.html
-- name: Ensure image
+- name: Ensure cirros test image installed
   hosts: controller
   gather_facts: False
   tags:
     - image
   vars:
-    imgfile: cirros-0.3.0-x86_64-disk.img
-    cirros_url: https://launchpad.net/cirros/trunk/0.3.0/+download/$imgfile
+    img_name: cirros-0.3.1-x86_64
+    img_url: http://cdn.download.cirros-cloud.net/0.3.1/cirros-0.3.1-x86_64-disk.img
 
   tasks:
   - name: ensure temporary image directory exists
     file: dest=/tmp/images state=directory
 
   - name: ensure test image has been obtained
-    get_url: url=$cirros_url dest=/tmp/images/$imgfile
+    get_url: url=$img_url dest=/tmp/images/$img_name
 
-  - name: add cirros image
-    glance: name=cirros-0.3.0-x86_64 file=/tmp/images/$imgfile disk_format=qcow2 is_public=true user=admin tenant=demo password=secrete region=RegionOne auth_url=http://${controller_ip}:5000/v2.0
+  - name: add cirros image to glance
+    glance: name=$img_name file=/tmp/images/$img_name disk_format=qcow2 is_public=true user=admin tenant=demo password=secrete region=RegionOne auth_url=http://${controller_ip}:5000/v2.0
