@@ -12,6 +12,7 @@ Vagrant::Config.run do |config|
   config.vm.define :controller do |controller_config|
     controller_config.vm.host_name = "controller"
     controller_config.vm.customize ["modifyvm", :id, "--memory", 1200]
+    controller_config.vm.customize ["modifyvm", :id, "--rtcuseutc", "on"]
     controller_config.vm.network :hostonly, "10.0.10.10" # eth1 mgt
     controller_config.vm.network :hostonly, "192.168.10.10" # eth2 tenant api
   end
@@ -19,6 +20,7 @@ Vagrant::Config.run do |config|
   config.vm.define :netnode do |netnode_config|
     netnode_config.vm.host_name = "netnode"
     netnode_config.vm.customize ["modifyvm", :id, "--memory", 512]
+    netnode_config.vm.customize ["modifyvm", :id, "--rtcuseutc", "on"]
     netnode_config.vm.network :hostonly, "10.0.10.11" # eth1 mgt
     netnode_config.vm.network :hostonly, "10.0.20.11" # eth2 vm traffic
     netnode_config.vm.network :hostonly, "192.168.101.101", :auto_config => false # eth3 external net
@@ -29,6 +31,7 @@ Vagrant::Config.run do |config|
   config.vm.define :compute1 do |compute1_config|
     compute1_config.vm.host_name = "compute1"
     compute1_config.vm.customize ["modifyvm", :id, "--memory", 1024]
+    compute1_config.vm.customize ["modifyvm", :id, "--rtcuseutc", "on"]
     compute1_config.vm.network :hostonly, "10.0.10.12" # eth1 mgt
     compute1_config.vm.network :hostonly, "10.0.20.12" # eth2 vm traffic
     compute1_config.vm.provision :shell, :inline => "ip link set mtu 1546 dev eth2"
