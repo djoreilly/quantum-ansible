@@ -56,6 +56,13 @@
           owner=quantum group=quantum mode=0660 backup=yes
     notify: restart l3 agent
 
+  - name: ensure dhcp agent is configured
+    template: >
+          src=templates/etc/quantum/dhcp_agent.ini.j2
+          dest=/etc/quantum/dhcp_agent.ini
+          owner=quantum group=quantum mode=0660 backup=yes
+    notify: restart dhcp agent
+
   - name: ensure metadata agent is configured
     template: >
           src=templates/etc/quantum/metadata_agent.ini.j2
