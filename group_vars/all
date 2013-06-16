@@ -1,7 +1,7 @@
 ---
 #
-log_debug: True
-log_verbose: False
+log_debug: False
+log_verbose: True
 
 #controller_ip: ${hostvars.controller.ansible_eth1.ipv4.address}
 controller_ip: 10.0.10.10
