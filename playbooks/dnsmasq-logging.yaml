@@ -1,0 +1,25 @@
+---
+- name: Have dnsmasq log to its own file instead of syslog and enable extra dhcp logging
+  hosts: netnode
+  sudo: True
+  gather_facts: False
+
+  tasks:
+
+  - name: ensure dnsmasq.conf is in place
+    copy: src=files/etc/quantum/dnsmasq.conf
+          dest=/etc/quantum/dnsmasq.conf
+          owner=quantum group=quantum mode=0664
+    notify: restart dhcp agent
+
+  - name: ensure dhcp_agent.ini is configured to use dnsmasq.conf
+    lineinfile: dest=/etc/quantum/dhcp_agent.ini
+                regexp='dnsmasq_config_file = /etc/quantum/dnsmasq.conf'
+                line='dnsmasq_config_file = /etc/quantum/dnsmasq.conf'
+    notify: restart dhcp agent
+
+
+  handlers:
+
+  - name: restart dhcp agent
+    action: service name=quantum-dhcp-agent state=restarted
