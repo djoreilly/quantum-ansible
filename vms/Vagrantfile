@@ -17,6 +17,7 @@ Vagrant.configure("2") do |config|
     controller_config.vm.provider "virtualbox" do |vb|
       vb.customize ["modifyvm", :id, "--memory", 1200]
       vb.customize ["modifyvm", :id, "--rtcuseutc", "on"]
+      vb.customize ["modifyvm", :id, "--uart1", "0x3F8", 4]
       vb.customize ["modifyvm", :id, "--nictype1", "virtio"]
       vb.customize ["modifyvm", :id, "--nictype2", "virtio"]
       vb.customize ["modifyvm", :id, "--nictype3", "virtio"]
@@ -31,6 +32,7 @@ Vagrant.configure("2") do |config|
     netnode_config.vm.provider "virtualbox" do |vb|
       vb.customize ["modifyvm", :id, "--memory", 512]
       vb.customize ["modifyvm", :id, "--rtcuseutc", "on"]
+      vb.customize ["modifyvm", :id, "--uart1", "0x3F8", 4]
       vb.customize ["modifyvm", :id, "--nictype1", "virtio"] # eth0
       vb.customize ["modifyvm", :id, "--nictype2", "virtio"] # eth1
       vb.customize ["modifyvm", :id, "--nictype3", "virtio"] # eth2
@@ -47,6 +49,7 @@ Vagrant.configure("2") do |config|
     compute1_config.vm.provider "virtualbox" do |vb|
       vb.customize ["modifyvm", :id, "--memory", 1024]
       vb.customize ["modifyvm", :id, "--rtcuseutc", "on"]
+      vb.customize ["modifyvm", :id, "--uart1", "0x3F8", 4]
       vb.customize ["modifyvm", :id, "--nictype1", "virtio"] # eth0
       vb.customize ["modifyvm", :id, "--nictype2", "virtio"] # eth1
       vb.customize ["modifyvm", :id, "--nictype3", "virtio"] # eth2
