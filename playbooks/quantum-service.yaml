@@ -2,6 +2,7 @@
 - name: Quantum virtual network service
   hosts: controller
   sudo: True
+  gather_facts: False
   tasks:
 
   - name: install quantum-server and CLI for accessing the API
@@ -28,9 +29,9 @@
       - python-sqlalchemy
       - quantum-plugin-openvswitch
 
-  - name: ensure ovs plugin configured to use database quantum
+  - name: ensure quantum service is configured to use ovs plugin
     template: >
-          src=templates/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
+          src=templates/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini.j2
           dest=/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
           owner=quantum group=quantum mode=0660 backup=yes
     notify:

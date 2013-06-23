@@ -1,0 +1,27 @@
+[DATABASE]
+sql_connection = mysql://quantum:{{ quantum_db_password }}@{{ controller_ip }}:3306/quantum
+reconnect_interval = 2
+
+[OVS]
+integration_bridge = br-int
+tenant_network_type = {{ ovs_net_type }}
+
+{% if ovs_net_type == 'gre' %}
+enable_tunneling = True
+tunnel_bridge = br-tun
+tunnel_id_ranges = 1:1000
+local_ip = {{ vm_net_ip }}
+{% endif %}
+
+{% if ovs_net_type == 'vlan' %}
+enable_tunneling = False
+network_vlan_ranges = physnet1:1000:1999
+bridge_mappings = physnet1:br-{{ vm_net_nic }}
+{% endif %}
+
+[AGENT]
+polling_interval = 5
+root_helper = sudo /usr/bin/quantum-rootwrap /etc/quantum/rootwrap.conf
+
+[SECURITYGROUP]
+firewall_driver = quantum.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
