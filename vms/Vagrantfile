@@ -1,40 +1,57 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant::Config.run do |config|
+Vagrant.configure("2") do |config|
 
-  config.vm.box = "precise64"
+  config.vm.box = "raring64"
+  config.vm.box_url = "http://cloud-images.ubuntu.com/vagrant/raring/current/raring-server-cloudimg-amd64-vagrant-disk1.box"
   
   # use a faster mirror - better in europe anyway
   config.vm.provision :shell,
     :inline => "sed -i 's/us.archive.ubuntu.com/mirror.sov.uk.goscomb.net/g' /etc/apt/sources.list"
     
   config.vm.define :controller do |controller_config|
-    controller_config.vm.host_name = "controller"
-    controller_config.vm.customize ["modifyvm", :id, "--memory", 1200]
-    controller_config.vm.customize ["modifyvm", :id, "--rtcuseutc", "on"]
-    controller_config.vm.network :hostonly, "10.0.10.10" # eth1 mgt
-    controller_config.vm.network :hostonly, "192.168.10.10" # eth2 tenant api
+    controller_config.vm.hostname = "controller"
+    controller_config.vm.network :private_network, ip: "10.0.10.10" # eth1 mgt
+    controller_config.vm.network :private_network, ip: "192.168.10.10" # eth2 tenant api
+    controller_config.vm.provider "virtualbox" do |vb|
+      vb.customize ["modifyvm", :id, "--memory", 1200]
+      vb.customize ["modifyvm", :id, "--rtcuseutc", "on"]
+      vb.customize ["modifyvm", :id, "--nictype1", "virtio"]
+      vb.customize ["modifyvm", :id, "--nictype2", "virtio"]
+      vb.customize ["modifyvm", :id, "--nictype3", "virtio"]
+    end
   end
 
   config.vm.define :netnode do |netnode_config|
-    netnode_config.vm.host_name = "netnode"
-    netnode_config.vm.customize ["modifyvm", :id, "--memory", 512]
-    netnode_config.vm.customize ["modifyvm", :id, "--rtcuseutc", "on"]
-    netnode_config.vm.network :hostonly, "10.0.10.11" # eth1 mgt
-    netnode_config.vm.network :hostonly, "10.0.20.11" # eth2 vm traffic
-    netnode_config.vm.network :hostonly, "192.168.101.101", :auto_config => false # eth3 external net
-    netnode_config.vm.customize ["modifyvm", :id, "--nicpromisc4", "allow-all"] # eth3
-    netnode_config.vm.provision :shell, :inline => "ip link set mtu 1546 dev eth2"
+    netnode_config.vm.hostname = "netnode"
+    netnode_config.vm.network :private_network, ip: "10.0.10.11" # eth1 mgt
+    netnode_config.vm.network :private_network, ip: "10.0.20.11", auto_config: false # eth2 vm traffic
+    netnode_config.vm.network :private_network, ip: "192.168.101.101", auto_config: false # eth3 external net
+    netnode_config.vm.provider "virtualbox" do |vb|
+      vb.customize ["modifyvm", :id, "--memory", 512]
+      vb.customize ["modifyvm", :id, "--rtcuseutc", "on"]
+      vb.customize ["modifyvm", :id, "--nictype1", "virtio"] # eth0
+      vb.customize ["modifyvm", :id, "--nictype2", "virtio"] # eth1
+      vb.customize ["modifyvm", :id, "--nictype3", "virtio"] # eth2
+      vb.customize ["modifyvm", :id, "--nictype4", "virtio"] # eth3
+      vb.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"] # eth2
+      vb.customize ["modifyvm", :id, "--nicpromisc4", "allow-all"] # eth3
+    end
   end
 
   config.vm.define :compute1 do |compute1_config|
-    compute1_config.vm.host_name = "compute1"
-    compute1_config.vm.customize ["modifyvm", :id, "--memory", 1024]
-    compute1_config.vm.customize ["modifyvm", :id, "--rtcuseutc", "on"]
-    compute1_config.vm.network :hostonly, "10.0.10.12" # eth1 mgt
-    compute1_config.vm.network :hostonly, "10.0.20.12" # eth2 vm traffic
-    compute1_config.vm.provision :shell, :inline => "ip link set mtu 1546 dev eth2"
+    compute1_config.vm.hostname = "compute1"
+    compute1_config.vm.network :private_network, ip: "10.0.10.12" # eth1 mgt
+    compute1_config.vm.network :private_network, ip: "10.0.20.12", auto_config: false # eth2 vm traffic
+    compute1_config.vm.provider "virtualbox" do |vb|
+      vb.customize ["modifyvm", :id, "--memory", 1024]
+      vb.customize ["modifyvm", :id, "--rtcuseutc", "on"]
+      vb.customize ["modifyvm", :id, "--nictype1", "virtio"] # eth0
+      vb.customize ["modifyvm", :id, "--nictype2", "virtio"] # eth1
+      vb.customize ["modifyvm", :id, "--nictype3", "virtio"] # eth2
+      vb.customize ["modifyvm", :id, "--nicpromisc3", "allow-all"] # eth2
+    end
   end
 
 end
