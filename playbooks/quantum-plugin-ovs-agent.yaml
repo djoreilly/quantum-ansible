@@ -1,52 +1,49 @@
 ---
-- name: Open vSwitch Quantum plugin L2 agent and Open vSwitch
+- name: OpenvSwitch Quantum plugin agent
   hosts:
     - netnode
     - compute_nodes
+  gather_facts: False
   sudo: True
+
   tasks:
-
-  - name: ensure packages are installed
-    apt: pkg=$item
-    with_items:
-      - openvswitch-common
-      - openvswitch-datapath-dkms
-      - openvswitch-datapath-source
-      - openvswitch-switch
-      - kernel-package
-
-  - name: ensure OVS kernel module is loaded
-    action: command /sbin/modprobe openvswitch
-    register: modprobe_result
-    ignore_errors: True
-
-  - name: build openvswitch-datapath kernel module - this may take a while
-    action: command /usr/bin/module-assistant -i auto-install openvswitch-datapath
-    only_if: "'${modprobe_result.stderr}'.find('FATAL: Module openvswitch not found.') == 0"
-    notify: restart openvswitch services
-
-  handlers:
-  - name: restart openvswitch services
-    action: service name=openvswitch-switch state=restarted
-
-
-- name: ensure OVS plugin agent is configured
-  hosts:
-    - netnode
-    - compute_nodes
-  sudo: True
-  tasks:
-  - name: add default ovs bridge br-int for agent
-    action: command /usr/bin/ovs-vsctl -- --may-exist add-br br-int
+  - name: add default ovs bridge br-int for vms
+    command: /usr/bin/ovs-vsctl -- --may-exist add-br br-int
 
   - name: install agent package
     apt: name=quantum-plugin-openvswitch-agent
 
   - name: ensure ovs plugin agent configured
     template: >
-          src=templates/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
+          src=templates/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini.j2
           dest=/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
           owner=quantum group=quantum mode=0660 backup=yes
+    notify: restart ovs-agent
+
+  - name: create directory /etc/network/interfaces.d
+    file: path=/etc/network/interfaces.d state=directory owner=root group=root mode=0644
+
+  - name: configure network interface for vm traffic
+    template: >
+          src=templates/etc/network/interfaces.d/vm-nic.j2
+          dest=/etc/network/interfaces.d/vm-nic
+          owner=root group=root mode=0644
+
+  - name: ensure /etc/network/interfaces includes vm-nic
+    lineinfile: dest=/etc/network/interfaces
+                regexp='source /etc/network/interfaces.d/vm-nic'
+                line='source /etc/network/interfaces.d/vm-nic'
+
+  - name: bring inteface for vm traffic up now
+    command: /sbin/ifup {{ vm_net_nic }}
+
+  - name: create an OVS bridge br-ethX for vlan networking
+    command: /usr/bin/ovs-vsctl -- --may-exist add-br br-{{ vm_net_nic }}
+    when: ovs_net_type == 'vlan'
+
+  - name: add physical nic to br-ethX
+    command: /usr/bin/ovs-vsctl -- --may-exist add-port br-{{ vm_net_nic }} {{ vm_net_nic }}
+    when: ovs_net_type == 'vlan'
     notify: restart ovs-agent
 
   - name: ensure quantum.conf is configured
@@ -59,4 +56,3 @@
   handlers:
   - name: restart ovs-agent
     service: name=quantum-plugin-openvswitch-agent state=restarted
-

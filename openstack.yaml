@@ -6,6 +6,7 @@
 - include: playbooks/quantum-service.yaml
 - include: playbooks/nova-controller.yaml
 - include: playbooks/nova-compute.yaml
+- include: playbooks/openvswitch.yaml
 - include: playbooks/quantum-plugin-ovs-agent.yaml
 - include: playbooks/quantum-agents.yaml
 - include: playbooks/horizon.yaml

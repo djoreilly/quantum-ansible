@@ -1,0 +1,14 @@
+{% if ovs_net_type == 'gre' %}
+# {{ vm_net_nic }} for vm packets in IP/GRE
+auto {{ vm_net_nic }}
+iface {{ vm_net_nic }} inet static
+address {{ vm_net_ip }}
+netmask {{ vm_net_mask }}
+mtu 1546
+{% endif %}
+{% if ovs_net_type == 'vlan' %}
+# {{ vm_net_nic }} for vm layer-2 packets
+auto {{ vm_net_nic }}
+iface {{ vm_net_nic }} inet manual
+up ip link set dev {{ vm_net_nic }} up
+{% endif %}

@@ -1,0 +1,30 @@
+---
+- name: OpenvSwitch
+  hosts:
+    - netnode
+    - compute_nodes
+  sudo: True
+  gather_facts: False
+  tasks:
+
+  - name: ensure packages are installed
+    apt: pkg={{ item }}
+    with_items:
+      - openvswitch-common
+      - openvswitch-datapath-dkms
+      - openvswitch-datapath-source
+      - openvswitch-switch
+      - kernel-package
+
+  - name: check OVS datapath kernel module is loaded
+    shell: modprobe openvswitch || true
+    register: modprobe_result
+
+  - name: build openvswitch-datapath kernel module - this may take a while
+    command: /usr/bin/module-assistant -i auto-install openvswitch-datapath
+    when: 'modprobe_result.stderr == "FATAL: Module openvswitch not found."'
+    notify: restart openvswitch services
+
+  handlers:
+  - name: restart openvswitch services
+    action: service name=openvswitch-switch state=restarted

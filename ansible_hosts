@@ -1,6 +1,6 @@
 controller ansible_ssh_host=10.0.10.10 mgt_net_ip=10.0.10.10
 
-netnode    ansible_ssh_host=10.0.10.11 vm_net_nic=eth2 vm_net_ip=10.0.20.11
+netnode ansible_ssh_host=10.0.10.11 vm_net_nic=eth2 vm_net_ip=10.0.20.11 vm_net_mask=255.255.255.0
 
 [compute_nodes]
-compute1   ansible_ssh_host=10.0.10.12 vm_net_nic=eth2 vm_net_ip=10.0.20.12
+compute1 ansible_ssh_host=10.0.10.12 vm_net_nic=eth2 vm_net_ip=10.0.20.12 vm_net_mask=255.255.255.0
