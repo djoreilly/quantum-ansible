@@ -7,22 +7,16 @@ This repository contains a script that will automatically install OpenStack Griz
 
  * About 3GB of free RAM
  * git
- * Ansible >= v1.1
-
-            $ sudo pip install paramiko PyYAML Jinja2 ansible
-      Or follow [(http://ansible.cc/docs/gettingstarted.html)](http://ansible.cc/docs/gettingstarted.html)
-         
- * [Vagrant](http://vagrantup.com) (tested on 1.0.7)
- * VirtualBox (tested on 4.2.10-84104 on Ubuntu 12.10 Desktop)
-
-## Get the 64-bit Ubuntu 12.04 (precise) Vagrant box
-
-	vagrant box add precise64 http://files.vagrantup.com/precise64.box
+ * Ansible v1.2 [(http://ansible.cc/docs/gettingstarted.html)](http://ansible.cc/docs/gettingstarted.html)
+ * [Vagrant](http://vagrantup.com) tested with 1.2.2
+ * VirtualBox 4.2.10 (tested on Ubuntu 13.04 Desktop)
 
 ## Grab this repository and run the installer
 
         git clone http://github.com/djoreilly/quantum-ansible
         cd quantum-ansible
+        git checkout grizzly-raring
+        # optional: change ovs_net_type in group_vars/all from gre to vlan
         ./install-openstack
 
 It takes about 15 minutes and the dashboard should be available at [(http://10.0.10.10/horizon)](http://10.0.10.10/horizon)
