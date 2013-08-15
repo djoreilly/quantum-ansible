@@ -16,18 +16,18 @@
              dest=/etc/bash_completion.d/quantum.bash_completion force=no mode=0644
     
 
-- name: add user vagrant to group quantum
+- name: add user vagrant to groups quantum and adm
   hosts: netnode
   user: vagrant
   sudo: True
   gather_facts: False
   tasks:
   
-  - name: add user vagrant to group quantum
-    user: name=vagrant append=yes groups=quantum
+  - name: add user vagrant to groups quantum and adm
+    user: name=vagrant append=yes groups=quantum,adm
 
 
-- name: add user vagrant to groups quantum and nova  
+- name: add user vagrant to groups quantum, nova and adm
   hosts:
    - controller
    - compute_nodes
@@ -36,8 +36,8 @@
   gather_facts: False
   tasks:
 
-  - name: add user vagrant to groups quantum and nova
-    user: name=vagrant append=yes groups=quantum,nova
+  - name: add user vagrant to groups quantum, adm and nova
+    user: name=vagrant append=yes groups=quantum,nova,adm
 
 
 - name: add some shell aliases
