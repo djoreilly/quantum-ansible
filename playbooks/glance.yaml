@@ -36,7 +36,9 @@
     - restart glance-registry
 
   - name: initialize the database
-    glance_manage: action=dbsync
+    # FIXME
+    # glance_manage: action=dbsync
+    command: glance-manage db_sync
 
 
   handlers:
@@ -60,9 +62,14 @@
   tasks:
   - name: ensure temporary image directory exists
     file: dest=/tmp/images state=directory
+    tags: debug
 
   - name: ensure test image has been obtained
     get_url: url=$img_url dest=/tmp/images/$img_name
+    tags: debug
 
   - name: add cirros image to glance
-    glance: name=$img_name file=/tmp/images/$img_name disk_format=qcow2 is_public=true user=admin tenant=demo password=secrete region=RegionOne auth_url=http://${controller_ip}:5000/v2.0
+    #glance: name=$img_name file=/tmp/images/$img_name disk_format=qcow2 is_public=true user=admin tenant=demo password=secrete region=RegionOne auth_url=http://${controller_ip}:5000/v2.0
+    #FIXME and remove tags
+    command: glance --os-username admin --os-password secrete --os-tenant-name demo --os-auth-url http://10.0.10.10:5000/v2.0/ image-create --file /tmp/images/$img_name --disk-format qcow2 --is-public true --container-format bare --name cirros
+    tags: debug
