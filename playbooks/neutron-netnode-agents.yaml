@@ -1,0 +1,89 @@
+---
+- name: Neutron L3, DHCP, LBaaS and metadata agents
+  hosts: netnode
+  sudo: True
+  tasks:
+
+  - name: ensure ovs bridge br-ex for external network is present
+    command: /usr/bin/ovs-vsctl -- --may-exist add-br br-ex
+
+  - name: ensure br-ex has physical nic
+    command: /usr/bin/ovs-vsctl -- --may-exist add-port br-ex {{ ex_net_nic }}
+
+  - name: configure physical inteface for br-ex to be brought up at boot (1/3)
+    file: path=/etc/network/interfaces.d state=directory
+
+  - name: configure physical inteface for br-ex to be brought up at boot (2/3)
+    template: >
+          src=templates/etc/network/interfaces.d/ex-nic.j2
+          dest=/etc/network/interfaces.d/ex-nic
+          owner=root group=root mode=0644
+
+  - name: configure physical inteface for br-ex to be brought up at boot (3/3)
+    lineinfile: >
+          dest=/etc/network/interfaces
+          regexp='source /etc/network/interfaces.d/ex-nic'
+          line='source /etc/network/interfaces.d/ex-nic'
+
+  - name: bring up physical interface for br-ex now
+    command: /sbin/ifup {{ ex_net_nic }}
+
+  - name: install the packages
+    apt: name={{ item }}
+    with_items:
+      - neutron-l3-agent
+      - neutron-dhcp-agent
+      - neutron-lbaas-agent
+      - neutron-metadata-agent
+
+  - name: ensure neutron.conf is configured
+    template: >
+          src=templates/etc/neutron/neutron.conf.j2
+          dest=/etc/neutron/neutron.conf
+          owner=neutron group=neutron mode=0660 backup=yes
+    notify:
+      - restart l3 agent
+      - restart dhcp agent
+      - restart lbaas agent
+      - restart metadata agent
+
+  - name: ensure l3 agent is configured
+    template: >
+          src=templates/etc/neutron/l3_agent.ini.j2
+          dest=/etc/neutron/l3_agent.ini
+          owner=neutron group=neutron mode=0660 backup=yes
+    notify: restart l3 agent
+
+  - name: ensure dhcp agent is configured
+    template: >
+          src=templates/etc/neutron/dhcp_agent.ini.j2
+          dest=/etc/neutron/dhcp_agent.ini
+          owner=neutron group=neutron mode=0660 backup=yes
+    notify: restart dhcp agent
+
+  - name: ensure lbaas agent is configured
+    template: >
+          src=templates/etc/neutron/lbaas_agent.ini.j2
+          dest=/etc/neutron/lbaas_agent.ini
+          owner=neutron group=neutron mode=0660 backup=yes
+    notify: restart lbaas agent
+
+  - name: ensure metadata agent is configured
+    template: >
+          src=templates/etc/neutron/metadata_agent.ini.j2
+          dest=/etc/neutron/metadata_agent.ini
+          owner=neutron group=neutron mode=0660 backup=yes
+    notify: restart metadata agent
+
+  handlers:
+    - name: restart l3 agent
+      action: service name=neutron-l3-agent state=restarted
+
+    - name: restart dhcp agent
+      action: service name=neutron-dhcp-agent state=restarted
+
+    - name: restart lbaas agent
+      action: service name=neutron-lbaas-agent state=restarted
+
+    - name: restart metadata agent
+      action: service name=neutron-metadata-agent state=restarted
