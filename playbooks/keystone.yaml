@@ -27,7 +27,7 @@
 
   - name: ensure keystone config script is present
     template: >
-          src=templates/etc/keystone/keystone.conf
+          src=templates/etc/keystone/keystone.conf.j2
           dest=/etc/keystone/keystone.conf
           owner=keystone
           group=keystone
@@ -35,8 +35,11 @@
     notify: restart keystone
 
   - name: initialize keystone database
-    keystone_manage: action=db_sync
+    #FIXME
+    #keystone_manage: action=db_sync
+    command: keystone-manage db_sync
     notify: restart keystone
+    ignore_errors: True
 
   handlers:
    - name: restart keystone
@@ -62,8 +65,8 @@
         password: $ec2_identity_password
       - name: swift
         password: $swift_identity_password
-      - name: quantum
-        password: $quantum_identity_password
+      - name: neutron
+        password: $neutron_identity_password
       - name: cinder
         password: $cinder_identity_password
 
@@ -105,9 +108,9 @@
         #  public_url: http://${controller_ip}:8888/v1/AUTH_%(tenant_id)s
         #  internal_url: http://${controller_ip}:8888/v1/AUTH_%(tenant_id)s
         #  admin_url: http://${controller_ip}:8888/v1
-      - name: quantum
+      - name: neutron
         type: network
-        description: Quantum Network Service
+        description: Neutron Network Service
         public_url: http://${controller_ip}:9696
         internal_url: http://${controller_ip}:9696
         admin_url: http://${controller_ip}:9696
