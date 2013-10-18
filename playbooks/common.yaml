@@ -1,53 +1,20 @@
 ---
-- name: Common packages and time sync with controller
+- name: enable the ubuntu cloud archive
   hosts: all
   sudo: True
+  gather_facts: False
+
   tasks:
-    # This is necessary to use the apt_repository module
-  - name: ensure add-apt-repository, ubuntu-cloud-keyring and ntp are present
+
+    # https://wiki.ubuntu.com/ServerTeam/CloudArchive
+  - name: add key to ubuntu-cloud-keyring
     apt: pkg=$item update_cache=yes
     with_items:
       - python-software-properties
       - ubuntu-cloud-keyring
 
+  - name: add havana repo
+    apt_repository: repo="deb http://ubuntu-cloud.archive.canonical.com/ubuntu precise-updates/havana main"
+
   - name: update apt cache
     apt: update_cache=yes
-
-      # http://docs.openstack.org/folsom/openstack-compute/install/apt/content/installing-the-cloud-controller.html
-  - name: install cloud archive
-    apt_repository: repo="deb http://ubuntu-cloud.archive.canonical.com/ubuntu precise-updates/grizzly main"
-
-  - name: update the cache
-    apt: update_cache=yes
-
-
-- name: update ntp.conf file for server 
-  hosts: controller
-  sudo: True
-  gather_facts: True 
-  tasks:
-  - action: copy src=files/etc/ntp.conf dest=/etc/ntp.conf owner=root group=root mode=0644
-    notify: restart ntp
-  
-  handlers:
-  - name: restart ntp
-    service: name=ntp state=restarted
-
-
-- name: set up ntpdate clients to sync with controller node
-  hosts: 
-    - netnode
-    - compute_nodes
-  sudo: True
-  gather_facts: False
-  tasks:
-  - name: install ntpdate daily cron job
-    template: >
-          src=templates/etc/cron.daily/ntpdate 
-          dest=/etc/cron.daily/ntpdate 
-          owner=root group=root mode=0755
-
-  - name: stop ntp servive
-    service: name=ntp state=stopped enabled=no
-
-
