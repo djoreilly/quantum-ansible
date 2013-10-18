@@ -1,6 +1,6 @@
 controller ansible_ssh_host=10.0.10.10
 
-netnode    ansible_ssh_host=10.0.10.11
+netnode ansible_ssh_host=10.0.10.11 ex_net_nic=eth3
 
 [compute_nodes]
 compute1 ansible_ssh_host=10.0.10.12

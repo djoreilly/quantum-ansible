@@ -1,5 +1,0 @@
-#!/bin/sh
-
-
-ip link set {{ ext_net_nic }} up
-ip link set dev br-ex up
