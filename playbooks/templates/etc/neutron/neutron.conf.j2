@@ -2,12 +2,15 @@
 # Default log level is INFO
 # verbose and debug has the same result.
 # One of them will set DEBUG log level output
+# debug = False
+# verbose = False
+
 debug = {{ log_debug }}
 verbose = {{ log_verbose }}
 
-# Where to store Quantum state files.  This directory must be writable by the
+# Where to store Neutron state files.  This directory must be writable by the
 # user executing the agent.
-# state_path = /var/lib/quantum
+state_path = /var/lib/neutron
 
 # Where to store lock files
 lock_path = $state_path/lock
@@ -32,27 +35,26 @@ lock_path = $state_path/lock
 # publish_errors = False
 
 # Address to bind the API server
-bind_host = 0.0.0.0
+# bind_host = 0.0.0.0
 
 # Port the bind the API server to
-bind_port = 9696
+# bind_port = 9696
 
 # Path to the extensions.  Note that this can be a colon-separated list of
 # paths.  For example:
 # api_extensions_path = extensions:/path/to/more/extensions:/even/more/extensions
-# The __path__ of quantum.extensions is appended to this, so if your
+# The __path__ of neutron.extensions is appended to this, so if your
 # extensions are in there you don't need to specify them here
 # api_extensions_path =
 
-# Quantum plugin provider module
-# core_plugin =
-core_plugin = quantum.plugins.openvswitch.ovs_quantum_plugin.OVSQuantumPluginV2
+# Neutron plugin provider module
+core_plugin = neutron.plugins.openvswitch.ovs_neutron_plugin.OVSNeutronPluginV2
 
 # Advanced service modules
-service_plugins = quantum.plugins.services.agent_loadbalancer.plugin.LoadBalancerPlugin
+# service_plugins =
 
 # Paste configuration file
-api_paste_config = /etc/quantum/api-paste.ini
+# api_paste_config = api-paste.ini
 
 # The strategy to be used for auth.
 # Supported values are 'keystone'(default), 'noauth'.
@@ -70,7 +72,7 @@ api_paste_config = /etc/quantum/api-paste.ini
 # mac_generation_retries = 16
 
 # DHCP Lease duration (in seconds)
-# dhcp_lease_duration = 120
+# dhcp_lease_duration = 86400
 
 # Allow sending resource operation notification to DHCP agent
 # dhcp_agent_notification = True
@@ -82,18 +84,19 @@ api_paste_config = /etc/quantum/api-paste.ini
 # Enable or disable sorting
 # allow_sorting = False
 # Enable or disable overlapping IPs for subnets
-# Attention: the following parameter MUST be set to False if Quantum is
-# being used in conjunction with nova security groups and/or metadata service.
+# Attention: the following parameter MUST be set to False if Neutron is
+# being used in conjunction with nova security groups
 # allow_overlapping_ips = False
 # Ensure that configured gateway is on subnet
 # force_gateway_on_subnet = False
 
+allow_overlapping_ips = True
 
 # RPC configuration options. Defined in rpc __init__
 # The messaging module to use, defaults to kombu.
-# rpc_backend = quantum.openstack.common.rpc.impl_kombu
+# rpc_backend = neutron.openstack.common.rpc.impl_kombu
 # Size of RPC thread pool
-# rpc_thread_pool_size = 64,
+# rpc_thread_pool_size = 64
 # Size of RPC connection pool
 # rpc_conn_pool_size = 30
 # Seconds to wait for a response from call or multicall
@@ -102,9 +105,10 @@ api_paste_config = /etc/quantum/api-paste.ini
 # rpc_cast_timeout = 30
 # Modules of exceptions that are permitted to be recreated
 # upon receiving exception data from an rpc call.
-# allowed_rpc_exception_modules = quantum.openstack.common.exception, nova.exception
+# allowed_rpc_exception_modules = neutron.openstack.common.exception, nova.exception
 # AMQP exchange to connect to if using RabbitMQ or QPID
-control_exchange = quantum
+
+control_exchange = neutron
 
 # If passed, use a fake RabbitMQ provider
 # fake_rabbit = False
@@ -120,13 +124,14 @@ control_exchange = quantum
 # SSL certification authority file (valid only if SSL enabled)'
 # kombu_ssl_ca_certs =
 # IP address of the RabbitMQ installation
-
-rabbit_host = {{ controller_ip }}
-
+# rabbit_host = localhost
 # Password of the RabbitMQ server
 # rabbit_password = guest
 # Port where RabbitMQ server is running/listening
 # rabbit_port = 5672
+# RabbitMQ single or HA cluster (host:port pairs i.e: host1:5672, host2:5672)
+# rabbit_hosts is defaulted to '$rabbit_host:$rabbit_port'
+# rabbit_hosts = localhost:5672
 # User ID used for RabbitMQ connections
 # rabbit_userid = guest
 # Location of a virtual RabbitMQ installation.
@@ -136,13 +141,21 @@ rabbit_host = {{ controller_ip }}
 # rabbit_max_retries = 0
 # RabbitMQ connection retry interval
 # rabbit_retry_interval = 1
+# Use HA queues in RabbitMQ (x-ha-policy: all).You need to
+# wipe RabbitMQ database when changing this option. (boolean value)
+# rabbit_ha_queues = false
+
+rabbit_host = {{ controller_ip }}
 
 # QPID
-# rpc_backend=quantum.openstack.common.rpc.impl_qpid
+# rpc_backend=neutron.openstack.common.rpc.impl_qpid
 # Qpid broker hostname
 # qpid_hostname = localhost
 # Qpid broker port
 # qpid_port = 5672
+# Qpid single or HA cluster (host:port pairs i.e: host1:5672, host2:5672)
+# qpid_hosts is defaulted to '$qpid_hostname:$qpid_port'
+# qpid_hosts = localhost:5672
 # Username for qpid connection
 # qpid_username = ''
 # Password for qpid connection
@@ -157,7 +170,7 @@ rabbit_host = {{ controller_ip }}
 # qpid_tcp_nodelay = True
 
 # ZMQ
-# rpc_backend=quantum.openstack.common.rpc.impl_zmq
+# rpc_backend=neutron.openstack.common.rpc.impl_zmq
 # ZeroMQ bind address. Should be a wildcard (*), an ethernet interface, or IP.
 # The "host" option should point or resolve to this address.
 # rpc_zmq_bind_address = *
@@ -171,14 +184,14 @@ rabbit_host = {{ controller_ip }}
 
 # Notification_driver can be defined multiple times
 # Do nothing driver
-# notification_driver = quantum.openstack.common.notifier.no_op_notifier
+# notification_driver = neutron.openstack.common.notifier.no_op_notifier
 # Logging driver
-# notification_driver = quantum.openstack.common.notifier.log_notifier
+# notification_driver = neutron.openstack.common.notifier.log_notifier
 # RPC driver. DHCP agents needs it.
-notification_driver = quantum.openstack.common.notifier.rpc_notifier
+notification_driver = neutron.openstack.common.notifier.rpc_notifier
 
 # default_notification_level is used to form actual topic name(s) or to set logging level
-default_notification_level = INFO
+# default_notification_level = INFO
 
 # default_publisher_id is a part of the notification payload
 # host = myhost.com
@@ -186,7 +199,7 @@ default_notification_level = INFO
 
 # Defined in rpc_notifier, can be comma separated values.
 # The actual topic names will be %s.%(default_notification_level)s
-notification_topics = notifications
+# notification_topics = notifications
 
 # Default maximum number of items returned in a single response,
 # value == infinite and value < 0 means no max limit, and value must
@@ -211,21 +224,55 @@ notification_topics = notifications
 
 # =========== items for agent scheduler extension =============
 # Driver to use for scheduling network to DHCP agent
-# network_scheduler_driver = quantum.scheduler.dhcp_agent_scheduler.ChanceScheduler
+# network_scheduler_driver = neutron.scheduler.dhcp_agent_scheduler.ChanceScheduler
 # Driver to use for scheduling router to a default L3 agent
-# router_scheduler_driver = quantum.scheduler.l3_agent_scheduler.ChanceScheduler
+# router_scheduler_driver = neutron.scheduler.l3_agent_scheduler.ChanceScheduler
+# Driver to use for scheduling a loadbalancer pool to an lbaas agent
+# loadbalancer_pool_scheduler_driver = neutron.services.loadbalancer.agent_scheduler.ChanceScheduler
 
 # Allow auto scheduling networks to DHCP agent. It will schedule non-hosted
 # networks to first DHCP agent which sends get_active_networks message to
-# quantum server
+# neutron server
 # network_auto_schedule = True
 
 # Allow auto scheduling routers to L3 agent. It will schedule non-hosted
-# routers to first L3 agent which sends sync_routers message to quantum server
+# routers to first L3 agent which sends sync_routers message to neutron server
 # router_auto_schedule = True
+
+# Number of DHCP agents scheduled to host a network. This enables redundant
+# DHCP agents for configured networks.
+# dhcp_agents_per_network = 1
+
 # ===========  end of items for agent scheduler extension =====
 
-[QUOTAS]
+# =========== WSGI parameters related to the API server ==============
+# Sets the value of TCP_KEEPIDLE in seconds to use for each server socket when
+# starting API server. Not supported on OS X.
+# tcp_keepidle = 600
+
+# Number of seconds to keep retrying to listen
+# retry_until_window = 30
+
+# Number of backlog requests to configure the socket with.
+# backlog = 4096
+
+# Enable SSL on the API server
+# use_ssl = False
+
+# Certificate file to use when starting API server securely
+# ssl_cert_file = /path/to/certfile
+
+# Private key file to use when starting API server securely
+# ssl_key_file = /path/to/keyfile
+
+# CA certificate file to use when starting API server securely to
+# verify connecting clients. This is an optional parameter only required if
+# API clients need to authenticate to the API server using SSL certificates
+# signed by a trusted CA
+# ssl_ca_file = /path/to/cafile
+# ======== end of WSGI parameters related to the API server ==========
+
+[quotas]
 # resource name(s) that are supported in quota features
 # quota_items = network,subnet,port
 
@@ -241,23 +288,21 @@ notification_topics = notifications
 # number of ports allowed per tenant, and minus means unlimited
 # quota_port = 50
 
+# number of security groups allowed per tenant, and minus means unlimited
+# quota_security_group = 10
+
+# number of security group rules allowed per tenant, and minus means unlimited
+# quota_security_group_rule = 100
+
 # default driver to use for quota checks
-# quota_driver = quantum.quota.ConfDriver
+# quota_driver = neutron.db.quota_db.DbQuotaDriver
 
-[DEFAULT_SERVICETYPE]
-# Description of the default service type (optional)
-# description = "default service type"
-# Enter a service definition line for each advanced service provided
-# by the default service type.
-# Each service definition should be in the following format:
-# <service>:<plugin>[:driver]
-
-[AGENT]
-# Use "sudo quantum-rootwrap /etc/quantum/rootwrap.conf" to use the real
+[agent]
+# Use "sudo neutron-rootwrap /etc/neutron/rootwrap.conf" to use the real
 # root filter facility.
 # Change to "sudo" to skip the filtering and just run the comand directly
-# root_helper = sudo
-root_helper = sudo quantum-rootwrap /etc/quantum/rootwrap.conf
+
+root_helper = sudo /usr/bin/neutron-rootwrap /etc/neutron/rootwrap.conf
 
 # =========== items for agent management extension =============
 # seconds between nodes reporting state to server, should be less than
@@ -271,6 +316,61 @@ auth_host = {{ controller_ip }}
 auth_port = 35357
 auth_protocol = http
 admin_tenant_name = service
-admin_user = quantum
-admin_password = {{ quantum_identity_password }}
-signing_dir = /var/lib/quantum/keystone-signing
+admin_user = neutron
+admin_password = {{ neutron_identity_password }}
+signing_dir = $state_path/keystone-signing
+
+[database]
+# This line MUST be changed to actually run the plugin.
+# Example:
+# connection = mysql://root:pass@127.0.0.1:3306/neutron
+# Replace 127.0.0.1 above with the IP address of the database used by the
+# main neutron server. (Leave it as is if the database runs on this host.)
+# connection = sqlite:////var/lib/neutron/neutron.sqlite
+
+sql_connection = mysql://neutron:{{ neutron_db_password }}@{{ controller_ip }}:3306/neutron
+
+# The SQLAlchemy connection string used to connect to the slave database
+# slave_connection =
+
+# Database reconnection retry times - in event connectivity is lost
+# set to -1 implies an infinite retry count
+# max_retries = 10
+
+# Database reconnection interval in seconds - if the initial connection to the
+# database fails
+# retry_interval = 10
+
+# Minimum number of SQL connections to keep open in a pool
+# min_pool_size = 1
+
+# Maximum number of SQL connections to keep open in a pool
+# max_pool_size = 10
+
+# Timeout in seconds before idle sql connections are reaped
+# idle_timeout = 3600
+
+# If set, use this value for max_overflow with sqlalchemy
+# max_overflow = 20
+
+# Verbosity of SQL debugging information. 0=None, 100=Everything
+# connection_debug = 0
+
+# Add python stack traces to SQL as comment strings
+# connection_trace = False
+
+# If set, use this value for pool_timeout with sqlalchemy
+# pool_timeout = 10
+
+[service_providers]
+# Specify service providers (drivers) for advanced services like loadbalancer, VPN, Firewall.
+# Must be in form:
+# service_provider=<service_type>:<name>:<driver>[:default]
+# List of allowed service type include LOADBALANCER, FIREWALL, VPN
+# Combination of <service type> and <name> must be unique; <driver> must also be unique
+# this is multiline option, example for default provider:
+# service_provider=LOADBALANCER:name:lbaas_plugin_driver_path:default
+# example of non-default provider:
+# service_provider=FIREWALL:name2:firewall_driver_path
+# --- Reference implementations ---
+service_provider=LOADBALANCER:Haproxy:neutron.services.loadbalancer.drivers.haproxy.plugin_driver.HaproxyOnHostPluginDriver:default

@@ -1,0 +1,49 @@
+---
+- name: Neutron virtual network service
+  hosts: controller
+  sudo: True
+  tasks:
+
+  - name: install neutron-server and CLI for accessing the API
+    apt: pkg={{ item }}
+    with_items:
+      - neutron-server
+      - python-cliff
+      - python-pyparsing
+
+  - name: ensure neutron database is present
+    mysql_db: name=neutron
+
+  - name: ensure neutron database user is present
+    mysql_user: name=neutron host={{ item }} password={{neutron_db_password }} priv=neutron.*:ALL
+    with_items:
+      - localhost
+      - '{{ controller_ip }}'
+
+  - name: install neutron open vswitch plugin and dependencies
+    apt: pkg={{ item }}
+    with_items:
+      - mysql-server
+      - python-mysqldb
+      - python-sqlalchemy
+      - neutron-plugin-openvswitch
+
+  - name: ensure ovs plugin configured to use database neutron
+    template: >
+          src=templates/etc/neutron/plugins/openvswitch/ovs_neutron_plugin.ini.j2
+          dest=/etc/neutron/plugins/openvswitch/ovs_neutron_plugin.ini
+          owner=neutron group=neutron mode=0660 backup=yes
+    notify:
+      - restart neutron-server
+
+  - name: ensure neutron.conf ok
+    template: >
+          src=templates/etc/neutron/neutron.conf.j2
+          dest=/etc/neutron/neutron.conf
+          owner=neutron group=neutron mode=0660 backup=yes
+    notify:
+      - restart neutron-server
+
+  handlers:
+    - name: restart neutron-server
+      service: name=neutron-server state=restarted
