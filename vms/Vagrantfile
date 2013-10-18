@@ -25,7 +25,7 @@ Vagrant.configure("2") do |config|
   config.vm.define :netnode do |netnode_config|
     netnode_config.vm.hostname = "netnode"
     netnode_config.vm.network :private_network, ip: "10.0.10.11" # eth1 mgt
-    netnode_config.vm.network :private_network, ip: "10.0.20.11", auto_config: false # eth2 vm traffic
+    netnode_config.vm.network :private_network, ip: "10.0.20.11" # eth2 vm data net
     netnode_config.vm.network :private_network, ip: "192.168.101.101", auto_config: false # eth3 external net
     netnode_config.vm.provider "virtualbox" do |vb|
       vb.customize ["modifyvm", :id, "--memory", 512]
@@ -41,7 +41,7 @@ Vagrant.configure("2") do |config|
   config.vm.define :compute1 do |compute1_config|
     compute1_config.vm.hostname = "compute1"
     compute1_config.vm.network :private_network, ip: "10.0.10.12" # eth1 mgt
-    compute1_config.vm.network :private_network, ip: "10.0.20.12", auto_config: false # eth2 vm traffic
+    compute1_config.vm.network :private_network, ip: "10.0.20.12" # eth2 vm data net
     compute1_config.vm.provider "virtualbox" do |vb|
       vb.customize ["modifyvm", :id, "--memory", 1024]
       vb.customize ["modifyvm", :id, "--rtcuseutc", "on"]

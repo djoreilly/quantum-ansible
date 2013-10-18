@@ -1,5 +1,5 @@
 ---
-- name: Open vSwitch Quantum plugin L2 agent and Open vSwitch
+- name: Open vSwitch and the Neutron plugin L2 agent for Open vSwitch
   hosts:
     - netnode
     - compute_nodes
@@ -7,7 +7,7 @@
   tasks:
 
   - name: ensure packages are installed
-    apt: pkg=$item
+    apt: pkg={{ item }}
     with_items:
       - openvswitch-common
       - openvswitch-datapath-dkms
@@ -35,28 +35,30 @@
     - netnode
     - compute_nodes
   sudo: True
+  gather_facts: True
+
   tasks:
   - name: add default ovs bridge br-int for agent
     action: command /usr/bin/ovs-vsctl -- --may-exist add-br br-int
 
   - name: install agent package
-    apt: name=quantum-plugin-openvswitch-agent
+    apt: name=neutron-plugin-openvswitch-agent
 
   - name: ensure ovs plugin agent configured
     template: >
-          src=templates/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
-          dest=/etc/quantum/plugins/openvswitch/ovs_quantum_plugin.ini
-          owner=quantum group=quantum mode=0660 backup=yes
+          src=templates/etc/neutron/plugins/openvswitch/ovs_neutron_plugin.ini.j2
+          dest=/etc/neutron/plugins/openvswitch/ovs_neutron_plugin.ini
+          owner=neutron group=neutron mode=0660 backup=yes
     notify: restart ovs-agent
 
-  - name: ensure quantum.conf is configured
+  - name: ensure neutron.conf is configured
     template: >
-          src=templates/etc/quantum/quantum.conf
-          dest=/etc/quantum/quantum.conf
-          owner=quantum group=quantum mode=0660 backup=yes
+          src=templates/etc/neutron/neutron.conf.j2
+          dest=/etc/neutron/neutron.conf
+          owner=neutron group=neutron mode=0660 backup=yes
     notify: restart ovs-agent
 
   handlers:
   - name: restart ovs-agent
-    service: name=quantum-plugin-openvswitch-agent state=restarted
+    service: name=neutron-plugin-openvswitch-agent state=restarted
 
