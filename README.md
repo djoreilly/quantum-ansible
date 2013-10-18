@@ -1,19 +1,19 @@
-# OpenStack Grizzly with Quantum Ansible installer for Vagrant
+# OpenStack Havana with Neutron installer
   
-This repository contains a script that will automatically install OpenStack Grizzly with Quantum networking onto VirtualBox VMs using [Ansible](http://ansible.cc/) and Vagrant. It is a modification of [Lorin Hochstein's](https://github.com/lorin/openstack-ansible) for Folsom that used networking from Nova. The configuration is described in vms/Vagrantfile and there is a diagram [here] (http://techbackground.blogspot.ie/2013/04/openstack-grizzly-with-quantum-multi.html)
+This repository contains a script that will automatically install OpenStack Havana with Neutron networking onto VirtualBox VMs using [Ansible](http://ansible.cc/) and Vagrant. It is a modification of [Lorin Hochstein's](https://github.com/lorin/openstack-ansible) for Folsom that used networking from Nova. The configuration is described in vms/Vagrantfile and there is a diagram [here] (http://techbackground.blogspot.ie/2013/04/openstack-grizzly-with-quantum-multi.html)
 
 
 ## Install prereqs
 
  * About 3GB of free RAM
  * git
- * Ansible >= v1.1
+ * Ansible (tested with v1.2)
 
             $ sudo pip install paramiko PyYAML Jinja2 ansible
       Or follow [(http://ansible.cc/docs/gettingstarted.html)](http://ansible.cc/docs/gettingstarted.html)
          
- * [Vagrant](http://vagrantup.com) (tested on 1.0.7)
- * VirtualBox (tested on 4.2.10-84104 on Ubuntu 12.10 Desktop)
+ * [Vagrant](http://vagrantup.com) (tested with 1.2.3)
+ * VirtualBox (tested with 4.2.10-84104 on Ubuntu 13.04 Desktop)
 
 ## Get the 64-bit Ubuntu 12.04 (precise) Vagrant box
 
@@ -23,10 +23,12 @@ This repository contains a script that will automatically install OpenStack Griz
 
         git clone http://github.com/djoreilly/quantum-ansible
         cd quantum-ansible
+        git checkout havana
         ./install-openstack
 
-It takes about 15 minutes and the dashboard should be available at [(http://10.0.10.10/horizon)](http://10.0.10.10/horizon)
-Also the controller has the Nova, Quantum and Cinder CLIs.
+It takes about 20 minutes, and the dashboard should be available at [(http://10.0.10.10/horizon)](http://10.0.10.10/horizon) with user=admin and password=secrete.
+
+Also the controller has the Nova, Neutron and Cinder CLIs.
 
     cd vms; vagrant ssh controller
 
@@ -35,3 +37,4 @@ Also the controller has the Nova, Quantum and Cinder CLIs.
 
     vagrant@controller:~$ source /vagrant/openrc
     vagrant@controller:~$ nova list
+    vagrant@controller:~$ neutron net-list
