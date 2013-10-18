@@ -6,7 +6,7 @@
   tasks:
   
   - name: ensure mysql and mysql python client installed
-    apt: pkg=$item
+    apt: pkg={{ item }}
     with_items:
       - python-mysqldb
       - mysql-server
@@ -17,7 +17,7 @@
 
   # http://dev.mysql.com/doc/refman/5.6/en/default-privileges.html
   - name: update mysql root password for all root accounts
-    mysql_user: name=root host=localhost password=$root_db_password
+    mysql_user: name=root host=localhost password={{ root_db_password }}
 
   # Need to do this for idempotency, see
   # http://ansible.cc/docs/modules.html#mysql-user
@@ -25,16 +25,16 @@
     template: src=templates/root/.my.cnf dest=/root/.my.cnf owner=root mode=0600
 
   - name: update mysql root password for all root accounts
-    mysql_user: name=root host=$item password=$root_db_password
+    mysql_user: name=root host={{ item }} password={{ root_db_password }}
     with_items:
-      - $controller_ip
+      - '{{ controller_ip }}'
       - 127.0.0.1
 
   - name: ensure anonymous users are not in the database
-    mysql_user: name='' host=$item state=absent
+    mysql_user: name='' host={{ item }} state=absent
     with_items:
-     - $controller_ip
-     - $inventory_hostname_short
+     - '{{ controller_ip }}'
+     - '{{ inventory_hostname_short }}'
      - 127.0.0.1
      - ::1
 
