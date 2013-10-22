@@ -49,27 +49,13 @@
     service: name=glance-api state=restarted
 
 
-  # http://docs.openstack.org/folsom/openstack-compute/install/apt/content/images-verifying-install.html
 - name: Ensure cirros test image installed
   hosts: controller
   gather_facts: False
-  tags:
-    - image
-  vars:
-    img_name: cirros-0.3.1-x86_64
-    img_url: http://cdn.download.cirros-cloud.net/0.3.1/cirros-0.3.1-x86_64-disk.img
-
   tasks:
-  - name: ensure temporary image directory exists
-    file: dest=/tmp/images state=directory
-    tags: debug
-
-  - name: ensure test image has been obtained
-    get_url: url=$img_url dest=/tmp/images/$img_name
-    tags: debug
 
   - name: add cirros image to glance
-    #glance: name=$img_name file=/tmp/images/$img_name disk_format=qcow2 is_public=true user=admin tenant=demo password=secrete region=RegionOne auth_url=http://${controller_ip}:5000/v2.0
-    #FIXME and remove tags
-    command: glance --os-username admin --os-password secrete --os-tenant-name demo --os-auth-url http://10.0.10.10:5000/v2.0/ image-create --file /tmp/images/$img_name --disk-format qcow2 --is-public true --container-format bare --name cirros-0.3.1-x86_64
-    tags: debug
+    glance_image: copy_from=http://cdn.download.cirros-cloud.net/0.3.1/cirros-0.3.1-x86_64-disk.img
+                  name=cirros-0.3.1-x86_64 disk_format=qcow2 is_public=true container_format=bare
+                  login_username=admin login_tenant_name=demo login_password=secrete
+                  region_name=RegionOne auth_url=http://${controller_ip}:5000/v2.0
