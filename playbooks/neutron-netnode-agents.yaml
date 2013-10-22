@@ -4,30 +4,6 @@
   sudo: True
   tasks:
 
-  - name: ensure ovs bridge br-ex for external network is present
-    command: /usr/bin/ovs-vsctl -- --may-exist add-br br-ex
-
-  - name: ensure br-ex has physical nic
-    command: /usr/bin/ovs-vsctl -- --may-exist add-port br-ex {{ ex_net_nic }}
-
-  - name: configure physical inteface for br-ex to be brought up at boot (1/3)
-    file: path=/etc/network/interfaces.d state=directory
-
-  - name: configure physical inteface for br-ex to be brought up at boot (2/3)
-    template: >
-          src=templates/etc/network/interfaces.d/ex-nic.j2
-          dest=/etc/network/interfaces.d/ex-nic
-          owner=root group=root mode=0644
-
-  - name: configure physical inteface for br-ex to be brought up at boot (3/3)
-    lineinfile: >
-          dest=/etc/network/interfaces
-          regexp='source /etc/network/interfaces.d/ex-nic'
-          line='source /etc/network/interfaces.d/ex-nic'
-
-  - name: bring up physical interface for br-ex now
-    command: /sbin/ifup {{ ex_net_nic }}
-
   - name: install the packages
     apt: name={{ item }}
     with_items:

@@ -6,7 +6,7 @@
 # matches your plugin.
 # interface_driver =
 
-interface_driver = neutron.agent.linux.interface.OVSInterfaceDriver
+interface_driver = neutron.agent.linux.interface.BridgeInterfaceDriver
 
 # Example of interface_driver option for OVS based plugins (OVS, Ryu, NEC)
 # that supports L3 agent
@@ -44,6 +44,8 @@ interface_driver = neutron.agent.linux.interface.OVSInterfaceDriver
 # Name of bridge used for external network traffic. This should be set to
 # empty value for the linux bridge
 # external_network_bridge = br-ex
+
+external_network_bridge =
 
 # TCP Port used by Neutron metadata server
 # metadata_port = 9697
