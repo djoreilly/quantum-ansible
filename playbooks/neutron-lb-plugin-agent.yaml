@@ -1,0 +1,30 @@
+- name: ensure linuxbridge plugin agent is configured
+  hosts:
+    - netnode
+    - compute_nodes
+  sudo: True
+  tasks:
+
+  - name: install agent package
+    apt: name=neutron-plugin-linuxbridge-agent
+
+  - name: ensure neutron.conf is configured
+    template: >
+          src=templates/etc/neutron/neutron.conf.j2
+          dest=/etc/neutron/neutron.conf
+          owner=neutron group=neutron mode=0660 backup=yes
+    notify:
+      - restart neutron-lb-agent
+
+  - name: ensure the LB plugin is configured
+    template: >
+          src=templates/etc/neutron/plugins/linuxbridge/linuxbridge_conf.ini.j2
+          dest=/etc/neutron/plugins/linuxbridge/linuxbridge_conf.ini
+          owner=neutron group=neutron mode=0660 backup=yes
+    notify:
+      - restart neutron-lb-agent
+
+  handlers:
+  - name: restart neutron-lb-agent
+    service: name=neutron-plugin-linuxbridge-agent state=restarted
+
