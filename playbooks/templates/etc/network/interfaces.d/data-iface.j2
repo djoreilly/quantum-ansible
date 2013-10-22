@@ -1,0 +1,3 @@
+auto {{ data_net_iface }}
+iface {{ data_net_iface }} inet manual
+up ip link set dev {{ data_net_iface }} up

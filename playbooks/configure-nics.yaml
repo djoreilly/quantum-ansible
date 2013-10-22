@@ -1,0 +1,50 @@
+---
+- name: configure the network interface for the external network
+  hosts: netnode
+  sudo: True
+  tasks:
+
+  - name: ensure /etc/network/interfaces.d/ exists
+    file: path=/etc/network/interfaces.d state=directory
+
+  - name: ensure interface config file exists
+    template: >
+          src=templates/etc/network/interfaces.d/ext-iface.j2
+          dest=/etc/network/interfaces.d/ext-iface
+          owner=root group=root mode=0644
+
+  - name: ensure /etc/network/interfaces sources the config file
+    lineinfile: >
+          dest=/etc/network/interfaces
+          regexp='source /etc/network/interfaces.d/ext-iface'
+          line='source /etc/network/interfaces.d/ext-iface'
+
+  - name: bring up physical interface for external network now
+    command: ip link set dev {{ ext_net_iface }} up
+
+
+
+- name: configure the interfaces for the data network
+  hosts:
+    - netnode
+    - compute_nodes
+  sudo: True
+  tasks:
+
+  - name: ensure /etc/network/interfaces.d/ exists
+    file: path=/etc/network/interfaces.d state=directory
+
+  - name: ensure interface config file exists
+    template: >
+          src=templates/etc/network/interfaces.d/data-iface.j2
+          dest=/etc/network/interfaces.d/data-iface
+          owner=root group=root mode=0644
+
+  - name: ensure /etc/network/interfaces sources the config file
+    lineinfile: >
+          dest=/etc/network/interfaces
+          regexp='source /etc/network/interfaces.d/data-iface'
+          line='source /etc/network/interfaces.d/data-iface'
+
+  - name: bring up physical interface for data network now
+    command: ip link set dev {{ data_net_iface }} up

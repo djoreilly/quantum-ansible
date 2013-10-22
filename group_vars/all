@@ -5,8 +5,9 @@ log_verbose: True
 
 #controller_ip: ${hostvars.controller.ansible_eth1.ipv4.address}
 controller_ip: 10.0.10.10
-local_vm_net_ip: '{{ ansible_eth2.ipv4.address }}'
-ext_net_nic: eth3
+
+data_net_iface: eth2
+ext_net_iface: eth3
 
 admin_token: 012345SECRET99TOKEN012345
 
