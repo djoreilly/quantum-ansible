@@ -1,0 +1,45 @@
+---
+- name: Neutron network service with the LinuxBridge plugin
+  hosts: controller
+  sudo: True
+  tasks:
+
+  - name: install the LinuxBridge plugin and dependencies if necessary
+    apt: pkg={{ item }}
+    with_items:
+      - neutron-server
+      - neutron-plugin-linuxbridge
+
+    # workaround a problem with the linuxbridge package
+  - copy: content='NEUTRON_PLUGIN_CONFIG="/etc/neutron/plugins/linuxbridge/linuxbridge_conf.ini"'
+          dest=/etc/default/neutron-server
+          owner=root group=root mode=644 backup=yes
+
+  - name: ensure a database named neutron is present
+    mysql_db: name=neutron
+
+  - name: ensure a mysql database user named neutron is present
+    mysql_user: name=neutron host={{ item }} password={{neutron_db_password }} priv=neutron.*:ALL
+    with_items:
+      - localhost
+      - '{{ controller_ip }}'
+
+  - name: ensure neutron.conf is configured to use the LinuxBridge plugin and the neutron db
+    template: >
+          src=templates/etc/neutron/neutron.conf.j2
+          dest=/etc/neutron/neutron.conf
+          owner=neutron group=neutron mode=0660 backup=yes
+    notify:
+      - restart neutron-server
+
+  - name: ensure the LB plugin is configured
+    template: >
+          src=templates/etc/neutron/plugins/linuxbridge/linuxbridge_conf.ini.j2
+          dest=/etc/neutron/plugins/linuxbridge/linuxbridge_conf.ini
+          owner=neutron group=neutron mode=0660 backup=yes
+    notify:
+      - restart neutron-server
+
+  handlers:
+    - name: restart neutron-server
+      service: name=neutron-server state=restarted
