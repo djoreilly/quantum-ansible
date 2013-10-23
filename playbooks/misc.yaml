@@ -1,33 +1,16 @@
 ---
-- name: add bash autocompletion scripts for CLIs
-  hosts: controller
-  user: vagrant
-  sudo: True
-  gather_facts: False
-  tasks:
-
-    # https://bugs.launchpad.net/ubuntu/+source/python-novaclient/+bug/1172420
-  - name: nova bash autocomplete
-    get_url: url=https://raw.github.com/openstack/python-novaclient/2.13.0/tools/nova.bash_completion
-             dest=/etc/bash_completion.d/nova.bash_completion force=no mode=0644
-
-  - name: quantum bash autocomplete
-    get_url: url=https://raw.github.com/openstack/python-quantumclient/2.2.0/tools/quantum.bash_completion
-             dest=/etc/bash_completion.d/quantum.bash_completion force=no mode=0644
-    
-
-- name: add user vagrant to group quantum
+- name: add user vagrant to group neutron
   hosts: netnode
   user: vagrant
   sudo: True
   gather_facts: False
   tasks:
-  
-  - name: add user vagrant to group quantum
-    user: name=vagrant append=yes groups=quantum
+
+  - name: add user vagrant to group neutron
+    user: name=vagrant append=yes groups=neutron
 
 
-- name: add user vagrant to groups quantum and nova  
+- name: add user vagrant to groups neutron and nova
   hosts:
    - controller
    - compute_nodes
@@ -36,8 +19,8 @@
   gather_facts: False
   tasks:
 
-  - name: add user vagrant to groups quantum and nova
-    user: name=vagrant append=yes groups=quantum,nova
+  - name: add user vagrant to groups neutron and nova
+    user: name=vagrant append=yes groups=neutron,nova
 
 
 - name: add some shell aliases
@@ -49,5 +32,4 @@
 
   - name: add alias to list openstack services
     lineinfile: name=/home/vagrant/.bashrc regexp='^alias osservices' 
-                line="alias osservices='cd /etc/init.d; ls quantum* nova* openvswitch* cinder* glance* libvirt-bin 2>/dev/null; cd - >/dev/null'"
-
+                line="alias osservices='cd /etc/init.d; ls neutron* nova* openvswitch* cinder* glance* libvirt-bin 2>/dev/null; cd - >/dev/null'"
