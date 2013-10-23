@@ -13,7 +13,7 @@ nova keypair-add --pub-key /vagrant/test-key.pub test-key
 neutron net-create net1
 neutron subnet-create net1 10.0.33.0/24 --name=sub1 --dns_nameservers 8.8.4.4 8.8.8.8
 
-neutron net-create ext-net --provider:network_type local --router:external true
+neutron net-create ext-net --provider:network_type flat --provider:physical_network extnet --router:external true
 neutron subnet-create ext-net 192.168.101.0/24 --enable_dhcp False --name ext-sub
 
 neutron router-create router1
