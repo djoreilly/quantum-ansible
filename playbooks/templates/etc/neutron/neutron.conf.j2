@@ -54,6 +54,8 @@ core_plugin = neutron.plugins.linuxbridge.lb_neutron_plugin.LinuxBridgePluginV2
 # Advanced service modules
 # service_plugins =
 
+service_plugins = neutron.services.firewall.fwaas_plugin.FirewallPlugin
+
 # Paste configuration file
 # api_paste_config = api-paste.ini
 

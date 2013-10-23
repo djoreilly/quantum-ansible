@@ -152,7 +152,7 @@ OPENSTACK_HYPERVISOR_FEATURES = {
 # balancer service, security groups, quotas, VPN service.
 OPENSTACK_NEUTRON_NETWORK = {
     'enable_lb': False,
-    'enable_firewall': False,
+    'enable_firewall': True,
     'enable_quotas': True,
     'enable_vpn': False,
     # The profile_support option is used to detect if an external router can be
