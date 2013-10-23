@@ -1,0 +1,11 @@
+--- /tmp/lb_neutron_plugin.py.broke	2013-10-22 20:50:10.689205096 +0000
++++ /tmp/lb_neutron_plugin.py.fixed	2013-10-22 20:51:09.604029483 +0000
+@@ -144,7 +144,7 @@
+         agent_id = kwargs.get('agent_id')
+         device = kwargs.get('device')
+         host = kwargs.get('host')
+-        port = self.get_port_from_device.get_port(device)
++        port = self.get_port_from_device(device)
+         LOG.debug(_("Device %(device)s up on %(agent_id)s"),
+                   {'device': device, 'agent_id': agent_id})
+         plugin = manager.NeutronManager.get_plugin()

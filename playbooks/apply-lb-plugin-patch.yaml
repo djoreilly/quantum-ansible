@@ -1,0 +1,20 @@
+---
+  # https://bugs.launchpad.net/neutron/+bug/1241602
+- name: Patch the neutron linuxbridge plugin for bug 1241602
+  hosts: controller
+  sudo: True
+  gather_facts: False
+
+  tasks:
+
+  - copy: src=files/tmp/lb-plugin.patch dest=/tmp/lb-plugin.patch
+
+  - apt: name=patch
+
+  - shell: patch -N /usr/share/pyshared/neutron/plugins/linuxbridge/lb_neutron_plugin.py /tmp/lb-plugin.patch || true
+           creates=/home/vagrant/lb-plugin-patch-applied
+    notify: restart neutron-server
+
+  handlers:
+  - name: restart neutron-server
+    service: name=neutron-server state=restarted
