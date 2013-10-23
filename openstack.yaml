@@ -1,11 +1,13 @@
+- include: playbooks/configure-nics.yaml
 - include: playbooks/common.yaml
 - include: playbooks/mysql.yaml
 - include: playbooks/keystone.yaml
 - include: playbooks/glance.yaml
 - include: playbooks/cinder.yaml
-- include: playbooks/neutron-service.yaml
+- include: playbooks/neutron-service-lb-plugin.yaml
+- include: playbooks/apply-lb-plugin-patch.yaml
 - include: playbooks/nova-controller.yaml
 - include: playbooks/nova-compute.yaml
-- include: playbooks/neutron-plugin-ovs-agent.yaml
+- include: playbooks/neutron-lb-plugin-agent.yaml
 - include: playbooks/neutron-netnode-agents.yaml
 - include: playbooks/horizon.yaml
