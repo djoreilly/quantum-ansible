@@ -49,12 +49,12 @@ lock_path = $state_path/lock
 
 # Neutron plugin provider module
 
-core_plugin = neutron.plugins.linuxbridge.lb_neutron_plugin.LinuxBridgePluginV2
+core_plugin = neutron.plugins.ml2.plugin.Ml2Plugin
 
 # Advanced service modules
 # service_plugins =
 
-service_plugins = neutron.services.firewall.fwaas_plugin.FirewallPlugin
+service_plugins = neutron.services.l3_router.l3_router_plugin.L3RouterPlugin, neutron.services.firewall.fwaas_plugin.FirewallPlugin
 
 # Paste configuration file
 # api_paste_config = api-paste.ini
