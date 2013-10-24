@@ -1,6 +1,6 @@
 # OpenStack Havana with Neutron installer
   
-This repository contains a script that will automatically install OpenStack Havana with Neutron networking (LinuxBridge plugin) onto VirtualBox VMs using [Ansible](http://ansible.cc/) and Vagrant. It is a modification of [Lorin Hochstein's](https://github.com/lorin/openstack-ansible) for Folsom that used networking from Nova. The configuration is described in vms/Vagrantfile.
+This repository contains a script that will automatically install OpenStack Havana with Neutron networking (ML2 plugin with linuxbridge agents) onto VirtualBox VMs using [Ansible](http://ansible.cc/) and Vagrant. It is a modification of [Lorin Hochstein's](https://github.com/lorin/openstack-ansible) for Folsom that used networking from Nova. The configuration is described in vms/Vagrantfile.
 
 
 ## Install prereqs
@@ -23,7 +23,7 @@ This repository contains a script that will automatically install OpenStack Hava
 
         git clone http://github.com/djoreilly/quantum-ansible
         cd quantum-ansible
-        git checkout havana-linuxbridge
+        git checkout havana-ml2-lb
         ./install-openstack
 
 It takes about 20 minutes, and the dashboard should be available at [(http://10.0.10.10/horizon)](http://10.0.10.10/horizon) with user=admin and password=secrete.
@@ -38,3 +38,5 @@ Also the controller has the Nova, Neutron and Cinder CLIs.
     vagrant@controller:~$ source /vagrant/openrc
     vagrant@controller:~$ nova list
     vagrant@controller:~$ neutron net-list
+
+The run-sample-session.sh shows how to create the external network with provider type flat.
