@@ -14,6 +14,7 @@
       - python-cinderclient
       - open-iscsi  # is this needed on controller?
       - tgt
+      - qemu-utils
 
   - name: ensure cinder database is present
     mysql_db: name=cinder
