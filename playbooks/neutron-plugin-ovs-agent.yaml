@@ -16,13 +16,12 @@
       - kernel-package
 
   - name: ensure OVS kernel module is loaded
-    action: command /sbin/modprobe openvswitch
+    shell: modprobe openvswitch || true
     register: modprobe_result
-    ignore_errors: True
 
   - name: build openvswitch-datapath kernel module - this may take a while
-    action: command /usr/bin/module-assistant -i auto-install openvswitch-datapath
-    only_if: "'${modprobe_result.stderr}'.find('FATAL: Module openvswitch not found.') == 0"
+    command: /usr/bin/module-assistant -i auto-install openvswitch-datapath
+    when: "'FATAL' in modprobe_result.stderr"
     notify: restart openvswitch services
 
   handlers:
