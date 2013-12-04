@@ -151,7 +151,7 @@ OPENSTACK_HYPERVISOR_FEATURES = {
 # services provided by neutron. Options currenly available are load
 # balancer service, security groups, quotas, VPN service.
 OPENSTACK_NEUTRON_NETWORK = {
-    'enable_lb': False,
+    'enable_lb': True,
     'enable_firewall': True,
     'enable_quotas': True,
     'enable_vpn': False,

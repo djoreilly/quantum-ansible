@@ -54,7 +54,7 @@ core_plugin = neutron.plugins.ml2.plugin.Ml2Plugin
 # Advanced service modules
 # service_plugins =
 
-service_plugins = neutron.services.l3_router.l3_router_plugin.L3RouterPlugin, neutron.services.firewall.fwaas_plugin.FirewallPlugin
+service_plugins = neutron.services.l3_router.l3_router_plugin.L3RouterPlugin, neutron.services.firewall.fwaas_plugin.FirewallPlugin, neutron.services.loadbalancer.plugin.LoadBalancerPlugin
 
 # Paste configuration file
 # api_paste_config = api-paste.ini
