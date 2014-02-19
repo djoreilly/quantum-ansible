@@ -3,7 +3,7 @@
 - include: playbooks/keystone.yaml
 - include: playbooks/glance.yaml
 - include: playbooks/cinder.yaml
-- include: playbooks/neutron-service.yaml
+- include: playbooks/neutron-service-ml2-plugin.yaml
 - include: playbooks/nova-controller.yaml
 - include: playbooks/nova-compute.yaml
 - include: playbooks/neutron-plugin-ovs-agent.yaml
