@@ -10,14 +10,14 @@
     
   # http://docs.openstack.org/folsom/openstack-compute/install/apt/content/setting-up-sql-database-mysql.html
   - name: ensure nova database user is present
-    mysql_user: name=nova host=$item password=$nova_db_password priv=nova.*:ALL
+    mysql_user: name=nova host={{ item }} password="{{ nova_db_password }}" priv=nova.*:ALL
     with_items:
       - '%'
       - localhost
  
     # http://docs.openstack.org/folsom/openstack-compute/install/apt/content/installing-the-cloud-controller.html
   - name: ensure nova packages are installed
-    apt: pkg=$item
+    apt: pkg={{ item }}
     with_items:
       - rabbitmq-server
       - nova-novncproxy
@@ -38,7 +38,7 @@
     template: src=templates/etc/nova/nova.conf dest=/etc/nova/nova.conf owner=nova group=nova mode=0660 backup=yes
 
   - name: ensure services are stopped
-    service: name=$item state=stopped
+    service: name={{ item }} state=stopped
     with_items:
       - nova-api
       - nova-conductor
@@ -52,7 +52,7 @@
     command: /usr/bin/nova-manage db sync
 
   - name: ensure services are started
-    service: name=$item state=started
+    service: name={{ item }} state=started
     with_items:
       - nova-api
       - nova-conductor
@@ -64,8 +64,8 @@
 
   - name: ensure rabbitmq starts after virtualbox additions at boot (1/2)
     file: dest=/etc/rc2.d/S20rabbitmq-server state=absent
-    when_string: $ansible_bios_version == "VirtualBox"
+    when: ansible_bios_version == "VirtualBox"
 
   - name: ensure rabbitmq starts after virtualbox additions at boot (2/2)
     file: src=/etc/init.d/rabbitmq-server dest=/etc/rc2.d/S95rabbitmq-server state=link
-    when_string: $ansible_bios_version == "VirtualBox"
+    when: ansible_bios_version == "VirtualBox"

@@ -4,7 +4,7 @@
   sudo: True
   tasks:
     - name: ensure horizon packages are installed
-      apt: pkg=$item update-cache=yes
+      apt: pkg={{ item }} update-cache=yes
       with_items:
         - memcached
         - libapache2-mod-wsgi
@@ -19,7 +19,7 @@
 
   handlers:
     - name: restart services
-      service: name=$item state=restarted
+      service: name={{ item }} state=restarted
       with_items:
         - apache2
         - memcached
