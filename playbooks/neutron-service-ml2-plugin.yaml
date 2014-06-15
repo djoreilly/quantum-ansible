@@ -4,6 +4,15 @@
   sudo: True
   tasks:
 
+  - name: install python-pip package
+    apt: pkg=python-pip
+
+    # this probably not needed if apt-get upgrade was run on the old vagrant image
+  - name: install or upgrade python six library
+    pip: name=six version=1.4.1
+    notify:
+      - restart neutron-server
+
   - name: install the neutron server package
     apt: pkg=neutron-server
 
