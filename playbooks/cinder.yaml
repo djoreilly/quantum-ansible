@@ -5,7 +5,7 @@
   tasks:
   
   - name: ensure packages are installed
-    apt: pkg=$item update_cache=yes
+    apt: pkg={{ item }} update_cache=yes
     with_items:
       - cinder-common
       - cinder-api
@@ -23,10 +23,10 @@
       - restart cinder services
       
   - name: ensure cinder database user is present
-    mysql_user: name=cinder host=$item password=$cinder_db_password priv=cinder.*:ALL
+    mysql_user: name=cinder host={{ item }} password="{{ cinder_db_password }}" priv=cinder.*:ALL
     with_items:
       - localhost
-      - $controller_ip
+      - "{{ controller_ip }}"
 
   - name: ensure api-paste.ini is configured
     template: >
@@ -70,7 +70,7 @@
     command: cinder-manage db sync
 
   - name: restart cinder services
-    service: name=$item state=restarted
+    service: name={{ item }} state=restarted
     with_items:
       - cinder-volume
       - cinder-api

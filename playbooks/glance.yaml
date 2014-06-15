@@ -19,9 +19,9 @@
       - restart glance-registry
 
   - name: ensure glance database user is present
-    mysql_user: name=glance host=$item password=${glance_db_password} priv=glance.*:ALL
+    mysql_user: name=glance host={{ item }} password="{{glance_db_password}}" priv=glance.*:ALL
     with_items:
-      - $controller_ip
+      - "{{ controller_ip }}"
       - localhost
 
   # http://docs.openstack.org/folsom/openstack-compute/install/apt/content/configure-glance-files.html
@@ -58,10 +58,10 @@
     glance_image: copy_from=http://cdn.download.cirros-cloud.net/0.3.1/cirros-0.3.1-x86_64-disk.img
                   name=cirros-0.3.1-x86_64 disk_format=qcow2 is_public=true container_format=bare
                   login_username=admin login_tenant_name=demo login_password=secrete
-                  region_name=RegionOne auth_url=http://${controller_ip}:5000/v2.0
+                  region_name=RegionOne auth_url=http://{{ controller_ip }}:5000/v2.0
 
   - name: add cirros 0.3.0 image to glance
     glance_image: copy_from=http://cdn.download.cirros-cloud.net/0.3.0/cirros-0.3.0-x86_64-disk.img
                   name=cirros-0.3.0-x86_64 disk_format=qcow2 is_public=true container_format=bare
                   login_username=admin login_tenant_name=demo login_password=secrete
-                  region_name=RegionOne auth_url=http://${controller_ip}:5000/v2.0
+                  region_name=RegionOne auth_url=http://{{ controller_ip }}:5000/v2.0

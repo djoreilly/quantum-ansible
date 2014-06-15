@@ -8,7 +8,7 @@
 
     # https://wiki.ubuntu.com/ServerTeam/CloudArchive
   - name: add key to ubuntu-cloud-keyring
-    apt: pkg=$item update_cache=yes
+    apt: pkg={{ item }} update_cache=yes
     with_items:
       - python-software-properties
       - ubuntu-cloud-keyring
