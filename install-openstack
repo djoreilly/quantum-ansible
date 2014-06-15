@@ -6,6 +6,7 @@ git submodule update --init
 
 ./start-nodes
 
+chmod 0600 vagrant_private_key
 ansible-playbook -v --timeout 30 openstack.yaml
 
 echo
